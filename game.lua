@@ -184,7 +184,7 @@ function Game.Draw()
 
     Game.Hero.Draw(Game.Map)
 
-    --Tile mouseover thing.
+    ----Tile mouseover thing.
     local mouseX = love.mouse.getX()
     local mouseY = love.mouse.getY()
     --We add one because of 1-based tables in lua (instead of 0)
@@ -197,6 +197,9 @@ function Game.Draw()
       love.graphics.print("Hors du tableau !", 0, GAME_HEIGHT - 32)
     end
     ----
+
+    local str_controls = "Press C to cut trees - Press D to drink water"
+    love.graphics.print(str_controls, 300, GAME_HEIGHT - 32)
 end
 
 return Game

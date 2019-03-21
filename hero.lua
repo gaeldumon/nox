@@ -6,7 +6,7 @@ Hero.line = 1
 Hero.column = 1
 Hero.keyPressed = false
 Hero.actionPressed = false
-cut_tree = false
+cut_tree = 0
 
 function Hero.Load()
 	Hero.Frames[1] = love.graphics.newImage('images/player_1.png')
@@ -24,17 +24,23 @@ function Hero.Update(pMap, dt)
 	end
 	----
 
+	if cut_tree == 3 then
+		print("Tree is cut !")
+		cut_tree = 0
+	end
+
 	----Dealing with the Hero ability to cut trees - WIP : if the hero has a tree on its right!
 	if love.keyboard.isDown('c', 'd') then
 
 		if Hero.actionPressed == false then
 
-			local action_id = pMap.Grid[Hero.line][Hero.column + 1]
+			action_id = pMap.Grid[Hero.line][Hero.column + 1]
 
 			if love.keyboard.isDown('c') then
 
 				if pMap.isTree(action_id) == true then
 					print("Cuting...")
+					cut_tree = cut_tree + 1
 				end
 
 			end
