@@ -62,6 +62,15 @@ function Game.Map.isTree(pID)
     return false
 end
 
+function Game.Map.isWater(pID)
+    local tileType = Game.Map.TileTypes[pID]
+    if tileType == 'water' then
+        return true
+    end
+
+    return false
+end
+
 function Game.Map.clearFog(pLine, pCol)
     print("Clear fog!")
     local c,l

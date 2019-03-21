@@ -16,25 +16,41 @@ function Hero.Load()
 end
 
 function Hero.Update(pMap, dt)
+	----Hero animation
 	--0.1 incrementation to reduce animation speed (10 times slower than +1 incrementation)
-	Hero.currentFrame = Hero.currentFrame + (5*dt)
+	Hero.currentFrame = Hero.currentFrame + ( 4 * dt)
 	if math.floor(Hero.currentFrame) > #Hero.Frames then
 		Hero.currentFrame = 1
 	end
+	----
 
 	----Dealing with the Hero ability to cut trees - WIP : if the hero has a tree on its right!
 	if love.keyboard.isDown('c', 'd') then
+
 		if Hero.actionPressed == false then
-			local tree_id = pMap.Grid[Hero.line][Hero.column+1]
+
+			local action_id = pMap.Grid[Hero.line][Hero.column + 1]
+
 			if love.keyboard.isDown('c') then
-				if pMap.isTree(tree_id) == true then
-					print("Cut tree !")
-					--Find a way to reload map grid with new tile updated (grass instead of tree)
-					pMap.Grid[tree_id] = 10
+
+				if pMap.isTree(action_id) == true then
+					print("Cuting...")
 				end
+
 			end
+
+			if love.keyboard.isDown('d') then
+
+				if pMap.isWater(action_id) == true then
+					print('Drinking...')
+				end
+
+			end
+
 			Hero.actionPressed = true
+
 		end
+
 	else
 		Hero.actionPressed = false
 	end
