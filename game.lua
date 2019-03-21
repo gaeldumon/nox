@@ -72,7 +72,7 @@ function Game.Map.isWater(pID)
 end
 
 function Game.Map.clearFog(pLine, pCol)
-    print("Clear fog!")
+    --print("Clear fog!")
     local c,l
     for l = 1, Game.Map.MAP_HEIGHT do
         for c = 1, Game.Map.MAP_WIDTH do
@@ -160,7 +160,7 @@ function Game.Keypressed(key)
 end
 
 function Game.Draw()
-    --Drawing the actual textures "cut" off the tilesheet in Game.Load()
+    ----Drawing the actual textures "cut" off the tilesheet in Game.Load()
     local c, l
     for l = 1, Game.Map.MAP_HEIGHT do
       for c = 1, Game.Map.MAP_WIDTH do

@@ -6,7 +6,8 @@ Hero.line = 1
 Hero.column = 1
 Hero.keyPressed = false
 Hero.actionPressed = false
-cut_tree = 0
+Hero.cut = 0
+tree_cut = false
 
 function Hero.Load()
 	Hero.Frames[1] = love.graphics.newImage('images/player_1.png')
@@ -24,26 +25,21 @@ function Hero.Update(pMap, dt)
 	end
 	----
 
-	if cut_tree == 3 then
-		print("Tree is cut !")
-		cut_tree = 0
-	end
-
-	----Dealing with the Hero ability to cut trees - WIP : if the hero has a tree on its right!
+	----Dealing with the Hero ability to do actions (cut trees, drink...)
 	if love.keyboard.isDown('c', 'd') then
 
 		if Hero.actionPressed == false then
 
-			action_id = pMap.Grid[Hero.line][Hero.column + 1]
-
-			if love.keyboard.isDown('c') then
+			local action_id = pMap.Grid[Hero.line][Hero.column + 1]
 
 				if pMap.isTree(action_id) == true then
-					print("Cuting...")
-					cut_tree = cut_tree + 1
-				end
 
-			end
+					if love.keyboard.isDown('c') then
+						print("Cuting...")
+						Hero.cut = Hero.cut + 1
+					end
+
+				end
 
 			if love.keyboard.isDown('d') then
 
@@ -62,7 +58,27 @@ function Hero.Update(pMap, dt)
 	end
 	----
 
+	----This block is used to reset the cuts counter (Hero.cut) to zero if the Hero is no longer adjacent to a tree
+	----this way each time I change tree for another I begin a fresh cuts count
+	do
+		local id = pMap.Grid[Hero.line][Hero.column+1]
+		if pMap.isTree(id) == false then
+			Hero.cut = 0
+		end
+	end
+	----
+
+	if Hero.cut == 3 then
+		print("Tree is cut !")
+		tree_cut = true
+		Hero.cut = 0
+	else
+		tree_cut = false
+	end
+
+	----Dealing with the Hero ability to move around and collide with solids
 	if love.keyboard.isDown('up', 'right', 'down', 'left') then
+
 		if Hero.keyPressed == false then
 
 			local old_column = Hero.column
@@ -101,12 +117,17 @@ function Hero.Update(pMap, dt)
 	else
 		Hero.keyPressed = false
 	end
+	----
 end
 
 function Hero.Draw(pMap)
 	local x = (Hero.column - 1) * pMap.TILE_WIDTH
 	local y = (Hero.line - 1) * pMap.TILE_HEIGHT
 	love.graphics.draw(Hero.Frames[math.floor(Hero.currentFrame)], x, y, 0, 2, 2)
+
+	if tree_cut == true then
+		pMap.Grid[Hero.line][Hero.column + 1] = 10
+	end
 end
 
 return Hero
