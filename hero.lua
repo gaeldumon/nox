@@ -7,6 +7,9 @@ Hero.column = 1
 Hero.keyPressed = false
 Hero.actionPressed = false
 Hero.cut = 0
+Hero.wood = 0
+Hero.life = 10
+Hero.drink = false
 tree_cut = false
 
 function Hero.Load()
@@ -61,7 +64,7 @@ function Hero.Update(pMap, dt)
 	----This block is used to reset the cuts counter (Hero.cut) to zero if the Hero is no longer adjacent to a tree
 	----this way each time I change tree for another I begin a fresh cuts count
 	do
-		local id = pMap.Grid[Hero.line][Hero.column+1]
+		local id = pMap.Grid[Hero.line][Hero.column + 1]
 		if pMap.isTree(id) == false then
 			Hero.cut = 0
 		end
@@ -71,6 +74,7 @@ function Hero.Update(pMap, dt)
 	if Hero.cut == 3 then
 		print("Tree is cut !")
 		tree_cut = true
+		Hero.wood = Hero.wood + 3
 		Hero.cut = 0
 	else
 		tree_cut = false
@@ -125,9 +129,12 @@ function Hero.Draw(pMap)
 	local y = (Hero.line - 1) * pMap.TILE_HEIGHT
 	love.graphics.draw(Hero.Frames[math.floor(Hero.currentFrame)], x, y, 0, 2, 2)
 
+	----If tree is cut (Hero.cut 3 times) then replacing tree tile with grass tile
+	----I write it here and not in Game cause it's a result of the Hero action on the map... bad idea ?
 	if tree_cut == true then
 		pMap.Grid[Hero.line][Hero.column + 1] = 10
 	end
+	----
 end
 
 return Hero
