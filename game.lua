@@ -51,7 +51,6 @@ function Game.Map.isSolid(pID)
     return false
 end
 
-
 function Game.Map.isTree(pID)
     local tileType = Game.Map.TileTypes[pID]
     if tileType == 'tree' then
@@ -64,6 +63,15 @@ end
 function Game.Map.isWater(pID)
     local tileType = Game.Map.TileTypes[pID]
     if tileType == 'water' then
+        return true
+    end
+
+    return false
+end
+
+function Game.Map.isCactus(pID)
+    local tileType = Game.Map.TileTypes[pID]
+    if tileType == 'cactus' then
         return true
     end
 
@@ -191,17 +199,17 @@ function Game.Draw()
     local line = math.floor(mouseY / Game.Map.TILE_HEIGHT) + 1
     if col > 0 and col <= Game.Map.MAP_WIDTH and line > 0 and line <= Game.Map.MAP_HEIGHT then
       local id = Game.Map.Grid[line][col]
-      love.graphics.print("Type de tile : " .. tostring(Game.Map.TileTypes[id]) .. " (ID = " .. tostring(id) .. ")", 0, GAME_HEIGHT - 30)
+      love.graphics.print("Type de tile : " .. tostring(Game.Map.TileTypes[id]) .. " (ID = " .. tostring(id) .. ")", GAME_WIDTH - 200, GAME_HEIGHT - 30)
     else
-      love.graphics.print("Hors du tableau !", 0, GAME_HEIGHT - 30)
+      love.graphics.print("Hors du tableau !", GAME_WIDTH - 200, GAME_HEIGHT - 30)
     end
     ----
 
-    local str_controls = "Press C to cut trees - Press D to drink water"
-    love.graphics.print(str_controls, 200, GAME_HEIGHT - 30)
+    local str_wood = "BUCHES DE BOIS : " .. tostring(Game.Hero.wood)
+    love.graphics.print(str_wood, 10, GAME_HEIGHT - 30)
 
-    local str_wood = "Bûches de bois : " .. tostring(Game.Hero.wood)
-    love.graphics.print(str_wood, 550, GAME_HEIGHT - 30)
+    local str_stats = "ENERGIE : " .. tostring(Game.Hero.energy)
+    love.graphics.print(str_stats, 150, GAME_HEIGHT - 30)
 end
 
 return Game

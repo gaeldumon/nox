@@ -7,8 +7,11 @@ Hero.column = 1
 Hero.keyPressed = false
 Hero.actionPressed = false
 Hero.cut = 0
+Hero.sound_cut = nil
+Hero.sound_getWood = nil
 Hero.wood = 0
-Hero.life = 10
+Hero.energy = 10
+Hero.sound_hurt = nil
 Hero.drink = false
 tree_cut = false
 
@@ -17,6 +20,12 @@ function Hero.Load()
 	Hero.Frames[2] = love.graphics.newImage('images/player_2.png')
 	Hero.Frames[3] = love.graphics.newImage('images/player_3.png')
 	Hero.Frames[4] = love.graphics.newImage('images/player_4.png')
+
+	Hero.sound_cut = love.audio.newSource('sounds/Thud.wav', 'static')
+	Hero.sound_getWood = love.audio.newSource('sounds/Find_Money.wav', 'static')
+	Hero.sound_getWood:setVolume(0.2)
+	Hero.sound_hurt = love.audio.newSource('sounds/Hero_Hurt.wav', 'static')
+	Hero.sound_hurt:setVolume(0.2)
 end
 
 function Hero.Update(pMap, dt)
@@ -28,34 +37,29 @@ function Hero.Update(pMap, dt)
 	end
 	----
 
-	----Dealing with the Hero ability to do actions (cut trees, drink...)
+	----IF YOU PRESS C OR D (aka actions) - It works if you have the tile on your right (i.e Hero.column+1)
 	if love.keyboard.isDown('c', 'd') then
-
 		if Hero.actionPressed == false then
-
 			local action_id = pMap.Grid[Hero.line][Hero.column + 1]
-
 				if pMap.isTree(action_id) == true then
-
 					if love.keyboard.isDown('c') then
 						print("Cuting...")
+						Hero.sound_cut:play()
 						Hero.cut = Hero.cut + 1
 					end
-
 				end
 
 			if love.keyboard.isDown('d') then
-
 				if pMap.isWater(action_id) == true then
-					print('Drinking...')
+					if Hero.energy < 10 then
+						Hero.energy = Hero.energy + 1
+						print('Drinking...')
+					end
 				end
-
 			end
 
 			Hero.actionPressed = true
-
 		end
-
 	else
 		Hero.actionPressed = false
 	end
@@ -71,16 +75,19 @@ function Hero.Update(pMap, dt)
 	end
 	----
 
+	----Tree-is-cut state, meaning you get 3 wood logs, cut counter is reset to 0, and tree_cut is true
 	if Hero.cut == 3 then
 		print("Tree is cut !")
 		tree_cut = true
+		Hero.sound_getWood:play()
 		Hero.wood = Hero.wood + 3
 		Hero.cut = 0
 	else
 		tree_cut = false
 	end
+	----
 
-	----Dealing with the Hero ability to move around and collide with solids
+	----IF YOU PRESS ARROWS (walk one by one, collide with solids, clear fog)
 	if love.keyboard.isDown('up', 'right', 'down', 'left') then
 
 		if Hero.keyPressed == false then
@@ -104,17 +111,22 @@ function Hero.Update(pMap, dt)
 				Hero.column = Hero.column - 1
 			end
 
-			----Hero collides with solid tiles types (see Game.Map.isSolid() in game.lua)
+			----Hero collides with solid tiles he stays on his "previous" tile
 			local id = pMap.Grid[Hero.line][Hero.column]
 
 			if pMap.isSolid(id) == true then
-				print("Collision with : " .. pMap.TileTypes[id])
 				Hero.column = old_column
 				Hero.line = old_line
+				print("Collision avec : " .. pMap.TileTypes[id])
 			else
 				pMap.clearFog(Hero.line, Hero.column)
 			end
 			----
+
+			if pMap.isCactus(id) == true then
+				Hero.energy = Hero.energy - 1
+				Hero.sound_hurt:play()
+			end
 
 			Hero.keyPressed = true
 		end
