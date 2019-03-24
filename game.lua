@@ -42,6 +42,9 @@ Game.Map.MAP_HEIGHT = 23
 Game.Map.TILE_WIDTH = 32
 Game.Map.TILE_HEIGHT = 32
 
+Game.bottomPadding = 32
+Game.music = nil
+
 function Game.Map.isSolid(pID)
     local tileType = Game.Map.TileTypes[pID]
     if tileType == 'sea' or tileType == 'tree' or tileType == 'cactus' or tileType == 'rock' then
@@ -78,6 +81,15 @@ function Game.Map.isCactus(pID)
     return false
 end
 
+function Game.Map.isLava(pID)
+    local tileType = Game.Map.TileTypes[pID]
+    if tileType == 'lava' then
+        return true
+    end
+
+    return false
+end
+
 function Game.Map.clearFog(pLine, pCol)
     --print("Clear fog!")
     local c,l
@@ -94,7 +106,6 @@ function Game.Map.clearFog(pLine, pCol)
             end
         end
     end
-
 end
 
 function Game.Load()
@@ -102,6 +113,10 @@ function Game.Load()
    
    Game.tilesheet = love.graphics.newImage('images/tilesheet.png')
    Game.TileTextures[0] = nil
+
+   Game.music = love.audio.newSource('sounds/cool.mp3', 'stream')
+   Game.music:setVolume(0.5)
+   Game.music:play()
 
     --Reading/cuting each tilesheet tiles one by one : not related to the screen in any way
     local nb_cols = Game.tilesheet:getWidth() / Game.Map.TILE_WIDTH
@@ -199,17 +214,25 @@ function Game.Draw()
     local line = math.floor(mouseY / Game.Map.TILE_HEIGHT) + 1
     if col > 0 and col <= Game.Map.MAP_WIDTH and line > 0 and line <= Game.Map.MAP_HEIGHT then
       local id = Game.Map.Grid[line][col]
-      love.graphics.print("Type de tile : " .. tostring(Game.Map.TileTypes[id]) .. " (ID = " .. tostring(id) .. ")", GAME_WIDTH - 200, GAME_HEIGHT - 30)
+      love.graphics.print("Type de tile : ".. tostring(Game.Map.TileTypes[id]) .. " (ID = " .. tostring(id) .. ")", 
+        GAME_WIDTH - 200, 
+        GAME_HEIGHT - Game.bottomPadding
+        )
     else
-      love.graphics.print("Hors du tableau !", GAME_WIDTH - 200, GAME_HEIGHT - 30)
+      love.graphics.print("Hors du tableau !", 
+        GAME_WIDTH - 200, 
+        GAME_HEIGHT - Game.bottomPadding
+        )
     end
     ----
 
+    ----Printing Hero stats and inventory
     local str_wood = "BUCHES DE BOIS : " .. tostring(Game.Hero.wood)
-    love.graphics.print(str_wood, 10, GAME_HEIGHT - 30)
+    love.graphics.print(str_wood, 10, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
 
     local str_stats = "ENERGIE : " .. tostring(Game.Hero.energy)
-    love.graphics.print(str_stats, 150, GAME_HEIGHT - 30)
+    love.graphics.print(str_stats, 232, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
+    ----
 end
 
 return Game

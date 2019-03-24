@@ -8,9 +8,10 @@ Hero.keyPressed = false
 Hero.actionPressed = false
 Hero.cut = 0
 Hero.sound_cut = nil
-Hero.sound_getWood = nil
 Hero.wood = 0
+Hero.sound_getWood = nil
 Hero.energy = 10
+Hero.sound_energy = nil
 Hero.sound_hurt = nil
 Hero.drink = false
 tree_cut = false
@@ -21,11 +22,13 @@ function Hero.Load()
 	Hero.Frames[3] = love.graphics.newImage('images/player_3.png')
 	Hero.Frames[4] = love.graphics.newImage('images/player_4.png')
 
-	Hero.sound_cut = love.audio.newSource('sounds/Thud.wav', 'static')
-	Hero.sound_getWood = love.audio.newSource('sounds/Find_Money.wav', 'static')
-	Hero.sound_getWood:setVolume(0.2)
+	Hero.sound_cut = love.audio.newSource('sounds/Shield.wav', 'static')
+	Hero.sound_cut:setVolume(0.5)
+	Hero.sound_getWood = love.audio.newSource('sounds/Shield.wav', 'static')
+	Hero.sound_getWood:setVolume(0.5)
 	Hero.sound_hurt = love.audio.newSource('sounds/Hero_Hurt.wav', 'static')
 	Hero.sound_hurt:setVolume(0.2)
+	Hero.sound_energy = love.audio.newSource('sounds/energy.wav', 'static')
 end
 
 function Hero.Update(pMap, dt)
@@ -40,19 +43,21 @@ function Hero.Update(pMap, dt)
 	----IF YOU PRESS C OR D (aka actions) - It works if you have the tile on your right (i.e Hero.column+1)
 	if love.keyboard.isDown('c', 'd') then
 		if Hero.actionPressed == false then
-			local action_id = pMap.Grid[Hero.line][Hero.column + 1]
+			local action_id = pMap.Grid[Hero.line + 1][Hero.column]
+
+			if love.keyboard.isDown('c') then
 				if pMap.isTree(action_id) == true then
-					if love.keyboard.isDown('c') then
-						print("Cuting...")
-						Hero.sound_cut:play()
-						Hero.cut = Hero.cut + 1
-					end
+					Hero.cut = Hero.cut + 1
+					Hero.sound_cut:play()
+					print("Cuting...")
 				end
+			end
 
 			if love.keyboard.isDown('d') then
 				if pMap.isWater(action_id) == true then
 					if Hero.energy < 10 then
 						Hero.energy = Hero.energy + 1
+						Hero.sound_energy:play()
 						print('Drinking...')
 					end
 				end
@@ -68,7 +73,7 @@ function Hero.Update(pMap, dt)
 	----This block is used to reset the cuts counter (Hero.cut) to zero if the Hero is no longer adjacent to a tree
 	----this way each time I change tree for another I begin a fresh cuts count
 	do
-		local id = pMap.Grid[Hero.line][Hero.column + 1]
+		local id = pMap.Grid[Hero.line + 1][Hero.column]
 		if pMap.isTree(id) == false then
 			Hero.cut = 0
 		end
@@ -111,9 +116,9 @@ function Hero.Update(pMap, dt)
 				Hero.column = Hero.column - 1
 			end
 
-			----Hero collides with solid tiles he stays on his "previous" tile
 			local id = pMap.Grid[Hero.line][Hero.column]
 
+			----Hero collides with solid tiles he stays on his "previous" tile
 			if pMap.isSolid(id) == true then
 				Hero.column = old_column
 				Hero.line = old_line
@@ -123,8 +128,12 @@ function Hero.Update(pMap, dt)
 			end
 			----
 
-			if pMap.isCactus(id) == true then
-				Hero.energy = Hero.energy - 1
+			if pMap.isCactus(id) == true or pMap.isLava(id) == true then
+				if Hero.energy > 0 then
+					Hero.energy = Hero.energy - 1
+				else
+					Hero.energy = 0
+				end
 				Hero.sound_hurt:play()
 			end
 
@@ -144,7 +153,7 @@ function Hero.Draw(pMap)
 	----If tree is cut (Hero.cut 3 times) then replacing tree tile with grass tile
 	----I write it here and not in Game cause it's a result of the Hero action on the map... bad idea ?
 	if tree_cut == true then
-		pMap.Grid[Hero.line][Hero.column + 1] = 10
+		pMap.Grid[Hero.line + 1][Hero.column] = 10
 	end
 	----
 end
