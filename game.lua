@@ -44,6 +44,7 @@ Game.Map.TILE_HEIGHT = 32
 
 Game.bottomPadding = 32
 Game.music = nil
+plague_count = 0
 
 function Game.Map.isSolid(pID)
     local tileType = Game.Map.TileTypes[pID]
@@ -105,6 +106,14 @@ function Game.Map.clearFog(pLine, pCol)
                 end
             end
         end
+    end
+end
+
+function Game.Map.plague()
+    local random_line = love.math.random(1, Game.Map.MAP_HEIGHT)
+    local random_col = love.math.random(1, Game.Map.MAP_WIDTH)
+    if Game.Map.Grid[random_line][random_col] ~= 76 then
+        Game.Map.Grid[random_line][random_col] = 76
     end
 end
 
@@ -176,6 +185,11 @@ end
 
 function Game.Update(dt)
     Game.Hero.Update(Game.Map, dt)
+    plague_count = plague_count + 60*dt
+    if plague_count >= 60 then
+        Game.Map.plague()
+        plague_count = 0
+    end
 end
 
 function Game.Keypressed(key)
