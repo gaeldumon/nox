@@ -44,6 +44,7 @@ Game.Map.TILE_HEIGHT = 32
 
 Game.bottomPadding = 32
 Game.music = nil
+
 plague_count = 0
 
 function Game.Map.isSolid(pID)
@@ -85,6 +86,15 @@ end
 function Game.Map.isLava(pID)
     local tileType = Game.Map.TileTypes[pID]
     if tileType == 'lava' then
+        return true
+    end
+
+    return false
+end
+
+function Game.Map.isPlague(pID)
+    local tileType = Game.Map.TileTypes[pID]
+    if tileType == 'plague' then
         return true
     end
 
@@ -166,6 +176,7 @@ function Game.Load()
     Game.Map.TileTypes[129] = 'rock'
     Game.Map.TileTypes[142] = 'tree'
     Game.Map.TileTypes[169] = 'rock'
+    Game.Map.TileTypes[76] = 'plague'
     ----
     print("Game: textures successfuly loaded.")
 
@@ -185,6 +196,7 @@ end
 
 function Game.Update(dt)
     Game.Hero.Update(Game.Map, dt)
+
     plague_count = plague_count + 60*dt
     if plague_count >= 60 then
         Game.Map.plague()
@@ -219,6 +231,15 @@ function Game.Draw()
     ----
 
     Game.Hero.Draw(Game.Map)
+
+    ----GAME OVER STATE - inducted in Hero (if Hero walks on plague tile) with the help of Game.Map.isPlague()
+    if Game.Hero.die == true then
+        Game.music:stop()
+        love.graphics.setColor(223,0,0)
+        love.graphics.print("YOU DEAD !", GAME_WIDTH / 2 - 132, GAME_HEIGHT / 2, 0, 5, 5)
+        love.graphics.setColor(255,255,255)
+    end
+    ----
 
     ----Tile mouseover thing.
     local mouseX = love.mouse.getX()

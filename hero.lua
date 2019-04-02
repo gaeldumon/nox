@@ -12,6 +12,8 @@ Hero.wood = 0
 Hero.sound_getWood = nil
 Hero.energy = 10
 Hero.sound_energy = nil
+Hero.die = false
+Hero.sound_die = nil
 Hero.sound_hurt = nil
 Hero.drink = false
 tree_cut = false
@@ -29,18 +31,23 @@ function Hero.Load()
 	Hero.sound_hurt = love.audio.newSource('sounds/Hero_Hurt.wav', 'static')
 	Hero.sound_hurt:setVolume(0.2)
 	Hero.sound_energy = love.audio.newSource('sounds/energy.wav', 'static')
+	Hero.sound_die = love.audio.newSource('sounds/Scream.wav', 'static')
 end
 
 function Hero.Update(pMap, dt)
-	----Hero animation
+	----HERO ANIMATION
 	--0.1 incrementation to reduce animation speed (10 times slower than +1 incrementation)
-	Hero.currentFrame = Hero.currentFrame + ( 4 * dt)
-	if math.floor(Hero.currentFrame) > #Hero.Frames then
+	if Hero.die == false then
+		Hero.currentFrame = Hero.currentFrame + ( 4 * dt)
+		if math.floor(Hero.currentFrame) > #Hero.Frames then
+			Hero.currentFrame = 1
+		end
+	else
 		Hero.currentFrame = 1
 	end
 	----
 
-	----IF YOU PRESS C OR D (aka actions) - It works if you have the tile on your right (i.e Hero.column+1)
+	----IF YOU PRESS C OR D (aka actions) - It works if you have the tile under you ((i.e Hero.line+1)
 	if love.keyboard.isDown('c', 'd') then
 		if Hero.actionPressed == false then
 			local action_id = pMap.Grid[Hero.line + 1][Hero.column]
@@ -70,7 +77,7 @@ function Hero.Update(pMap, dt)
 	end
 	----
 
-	----This block is used to reset the cuts counter (Hero.cut) to zero if the Hero is no longer adjacent to a tree
+	----This block is used to reset the cuting strikes counter (Hero.cut) to zero if the Hero is no longer adjacent to a tree
 	----this way each time I change tree for another I begin a fresh cuts count
 	do
 		local id = pMap.Grid[Hero.line + 1][Hero.column]
@@ -89,6 +96,13 @@ function Hero.Update(pMap, dt)
 		Hero.cut = 0
 	else
 		tree_cut = false
+	end
+	----
+
+	----If tree is cut (Hero.cut 3 times) then replacing tree tile with grass tile
+	----I write it here and not in Game cause it's a result of the Hero action on the map... bad idea ?
+	if tree_cut == true then
+		pMap.Grid[Hero.line + 1][Hero.column] = 10
 	end
 	----
 
@@ -118,7 +132,7 @@ function Hero.Update(pMap, dt)
 
 			local id = pMap.Grid[Hero.line][Hero.column]
 
-			----Hero collides with solid tiles he stays on his "previous" tile
+			----Hero collides with solid tiles, he stays on his "previous" tile
 			if pMap.isSolid(id) == true then
 				Hero.column = old_column
 				Hero.line = old_line
@@ -128,6 +142,7 @@ function Hero.Update(pMap, dt)
 			end
 			----
 
+			----If the hero collides with tiles that just hurt him (cactus, lava...)
 			if pMap.isCactus(id) == true or pMap.isLava(id) == true then
 				if Hero.energy > 0 then
 					Hero.energy = Hero.energy - 1
@@ -136,6 +151,15 @@ function Hero.Update(pMap, dt)
 				end
 				Hero.sound_hurt:play()
 			end
+			----
+
+			----GAME OVER STATE - If the hero collides with tiles that kill him instantly (plague tile)
+			if pMap.isPlague(id) == true then
+				Hero.die = true
+				Hero.energy = 0
+				Hero.sound_die:play()
+			end
+			----
 
 			Hero.keyPressed = true
 		end
@@ -143,19 +167,13 @@ function Hero.Update(pMap, dt)
 		Hero.keyPressed = false
 	end
 	----
+
 end
 
 function Hero.Draw(pMap)
 	local x = (Hero.column - 1) * pMap.TILE_WIDTH
 	local y = (Hero.line - 1) * pMap.TILE_HEIGHT
 	love.graphics.draw(Hero.Frames[math.floor(Hero.currentFrame)], x, y, 0, 2, 2)
-
-	----If tree is cut (Hero.cut 3 times) then replacing tree tile with grass tile
-	----I write it here and not in Game cause it's a result of the Hero action on the map... bad idea ?
-	if tree_cut == true then
-		pMap.Grid[Hero.line + 1][Hero.column] = 10
-	end
-	----
 end
 
 return Hero
