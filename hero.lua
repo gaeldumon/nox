@@ -18,6 +18,7 @@ Hero.sound_die = nil
 Hero.sound_hurt = nil
 Hero.drink = false
 tree_cut = false
+bcraft = false
 
 function Hero.Load()
 	Hero.Frames[1] = love.graphics.newImage('images/player_1.png')
@@ -39,8 +40,8 @@ function Hero.Update(pMap, dt)
 
 	if Hero.die == false then
 
-		----HERO ANIMATION if Hero is alive
-		--0.1 incrementation to reduce animation speed (10 times slower than +1 incrementation)
+		----HERO ANIMATION
+		--We increment by 0.1 to reduce animation speed (10 times slower than +1 incrementation)
 		if Hero.die == false then
 			Hero.currentFrame = Hero.currentFrame + ( 4 * dt)
 			if math.floor(Hero.currentFrame) > #Hero.Frames then
@@ -51,32 +52,39 @@ function Hero.Update(pMap, dt)
 		end
 		----
 
-		----IF YOU PRESS C OR D (aka actions) - For cuting trees it works if you have the tile under you ((i.e Hero.line+1)
-		if love.keyboard.isDown('c', 'd') then
-			if Hero.actionPressed == false then
-				local action_id = pMap.Grid[Hero.line + 1][Hero.column]
+		----HERO ACTIONS
+		Hero.actionID = pMap.Grid[Hero.line + 1][Hero.column]
 
+		if love.keyboard.isDown('c', 'd', 'f', 'v') then
+			if Hero.actionPressed == false then
+
+				----ACTION : CUT TREE
 				if love.keyboard.isDown('c') then
-					if pMap.isTree(action_id) == true then
+					if pMap.isTree(Hero.actionID) == true then
 						Hero.cut = Hero.cut + 1
 						Hero.sound_cut:play()
-						print("Cuting...")
+						print("Cuting")
 					end
 				end
+				----
 
+				----ACTION : DRINK WATER
 				if love.keyboard.isDown('d') then
-					if pMap.isWater(action_id) == true then
+					if pMap.isWater(Hero.actionID) == true then
 						if Hero.energy < 10 then
 							Hero.energy = Hero.energy + 1
 							Hero.sound_energy:play()
-							print('Drinking...')
+							print('Drinking')
 						end
 					end
 				end
+				----
 
+				----ACTION : CRAFT BUCKET
 				if love.keyboard.isDown('f') then
 
 				end
+				----
 
 				Hero.actionPressed = true
 			end
@@ -85,40 +93,31 @@ function Hero.Update(pMap, dt)
 		end
 		----
 
-		----TREES
-		----This block is used to reset the cuting strikes counter (Hero.cut) to zero if the Hero is no longer adjacent to a tree
-		----this way each time I change tree for another I begin a fresh cuts count
-		do
-			local id = pMap.Grid[Hero.line + 1][Hero.column]
-			if pMap.isTree(id) == false then
-				Hero.cut = 0
-			end
+		----RESETING TREE CUT COUNTER BETWEEN EACH TREES - Here because it's outside keyboard C action scope
+		if pMap.isTree(Hero.actionID) == false then
+			Hero.cut = 0
 		end
 		----
 
-		----Tree-is-cut state, meaning you get 3 wood logs, cut counter is reset to 0, and tree_cut is true
 		if Hero.cut == 3 then
-			print("Tree is cut !")
 			tree_cut = true
-			Hero.sound_getWood:play()
-			Hero.wood = Hero.wood + 3
-			--Every 2 trees cut (6 wood logs) then you have one bucket (that you can craft)
-			Hero.bucket = math.floor(Hero.bucket + (Hero.wood / 6))
-			Hero.cut = 0
 		else
 			tree_cut = false
 		end
-		----
 
-		----If tree is cut (Hero.cut 3 times) then replacing tree tile with grass tile
-		----I write it here and not in Game cause it's a result of the Hero action on the map... bad idea ?
 		if tree_cut == true then
+			Hero.wood = Hero.wood + 3
+			Hero.cut = 0
 			pMap.Grid[Hero.line + 1][Hero.column] = 10
-		end
-		----
-		----
+			Hero.sound_getWood:play()
 
-		----IF YOU PRESS ARROWS (walk one by one, collide with solids, clear fog)
+			if Hero.wood % 6 == 0 then
+				Hero.bucket = Hero.bucket + 1
+				Hero.wood = 0
+			end
+		end
+
+		----HERO CONTROLS (walk one by one, collide with solids, clear fog)
 		if love.keyboard.isDown('up', 'right', 'down', 'left') then
 
 			if Hero.keyPressed == false then
@@ -144,7 +143,7 @@ function Hero.Update(pMap, dt)
 
 				local id = pMap.Grid[Hero.line][Hero.column]
 
-				----Hero collides with solid tiles, he stays on his "previous" tile
+				----On keyboard push Hero collides with solid tiles : hero stays on his "previous" tile
 				if pMap.isSolid(id) == true then
 					Hero.column = old_column
 					Hero.line = old_line
@@ -154,7 +153,7 @@ function Hero.Update(pMap, dt)
 				end
 				----
 
-				----If the hero collides with tiles that just hurt him (cactus, lava...)
+				----On keyboard push if the hero collides with tiles that hurt him (cactus, lava)
 				if pMap.isCactus(id) == true or pMap.isLava(id) == true then
 					if Hero.energy > 0 then
 						Hero.energy = Hero.energy - 1
@@ -165,7 +164,7 @@ function Hero.Update(pMap, dt)
 				end
 				----
 
-				----HERO DIES - GAME OVER STATE - Flipping Hero.die to true (this is used in Game to pause screen, make text etc)
+				----HERO DIES - GAME OVER STATE - Hero.die is used in Game to pause hero update, make text, stop game music.
 				if pMap.isPlague(id) == true then
 					Hero.die = true
 					Hero.energy = 0
