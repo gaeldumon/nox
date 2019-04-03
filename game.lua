@@ -197,14 +197,13 @@ end
 function Game.Update(dt)
     Game.Hero.Update(Game.Map, dt)
 
+    ----PLAGUE TILES TIMER
     plague_count = plague_count + 60*dt
     if plague_count >= 60 then
         Game.Map.plague()
         plague_count = 0
     end
-end
-
-function Game.Keypressed(key)
+    ----
 end
 
 function Game.Draw()
@@ -230,18 +229,7 @@ function Game.Draw()
     end
     ----
 
-    Game.Hero.Draw(Game.Map)
-
-    ----GAME OVER STATE - inducted in Hero (if Hero walks on plague tile) with the help of Game.Map.isPlague()
-    if Game.Hero.die == true then
-        Game.music:stop()
-        love.graphics.setColor(223,0,0)
-        love.graphics.print("YOU DEAD !", GAME_WIDTH / 2 - 132, GAME_HEIGHT / 2, 0, 5, 5)
-        love.graphics.setColor(255,255,255)
-    end
-    ----
-
-    ----Tile mouseover thing.
+    ----TILE MOUSEOVER THING
     local mouseX = love.mouse.getX()
     local mouseY = love.mouse.getY()
     --We add one because of 1-based tables in lua (instead of 0)
@@ -261,12 +249,26 @@ function Game.Draw()
     end
     ----
 
+    Game.Hero.Draw(Game.Map)
+
+    ----HERO DIES - GAME OVER STATE - inducted in Hero (if Hero walks on plague tile) with the help of Game.Map.isPlague()
+    if Game.Hero.die == true then
+        Game.music:stop()
+        love.graphics.setColor(223,0,0)
+        love.graphics.print("YOU DEAD !", GAME_WIDTH / 2 - 200, GAME_HEIGHT / 2, 0, 5, 5)
+        love.graphics.setColor(255,255,255)
+    end
+    ----
+
     ----Printing Hero stats and inventory
     local str_wood = "BUCHES DE BOIS : " .. tostring(Game.Hero.wood)
     love.graphics.print(str_wood, 10, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
 
     local str_stats = "ENERGIE : " .. tostring(Game.Hero.energy)
     love.graphics.print(str_stats, 232, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
+
+    local str_bucket = "SEAU : " .. tostring(Game.Hero.bucket)
+    love.graphics.print(str_bucket, 400, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
     ----
 end
 
