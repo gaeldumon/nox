@@ -18,7 +18,7 @@ Hero.sound_die = nil
 Hero.sound_hurt = nil
 Hero.drink = false
 tree_cut = false
-bcraft = false
+craft_bucket = false
 
 function Hero.Load()
 	Hero.Frames[1] = love.graphics.newImage('images/player_1.png')
@@ -82,7 +82,6 @@ function Hero.Update(pMap, dt)
 
 				----ACTION : CRAFT BUCKET
 				if love.keyboard.isDown('f') then
-
 				end
 				----
 
@@ -113,7 +112,6 @@ function Hero.Update(pMap, dt)
 
 			if Hero.wood % 6 == 0 then
 				Hero.bucket = Hero.bucket + 1
-				Hero.wood = 0
 			end
 		end
 
