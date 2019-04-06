@@ -81,7 +81,10 @@ function Hero.Update(pMap, dt)
 				----
 
 				----ACTION : CRAFT BUCKET
-				if love.keyboard.isDown('f') then
+				if love.keyboard.isDown('f') and craft_bucket == true then
+					Hero.bucket = Hero.bucket + 1
+					Hero.wood = Hero.wood - 6
+					craft_bucket = false
 				end
 				----
 
@@ -98,21 +101,22 @@ function Hero.Update(pMap, dt)
 		end
 		----
 
+		--It takes 3 strikes (press C) to take down 1 tree
 		if Hero.cut == 3 then
 			tree_cut = true
-		else
-			tree_cut = false
-		end
-
-		if tree_cut == true then
+			--One tree gives 3 wood logs
 			Hero.wood = Hero.wood + 3
 			Hero.cut = 0
+			--Replacing the tree tile by a grass tile (index 10, 10th position of the tilesheet) when tree is cut
 			pMap.Grid[Hero.line + 1][Hero.column] = 10
 			Hero.sound_getWood:play()
-
+			--It takes 6 wood logs to be able to craft a bucket. 2 trees = 1 bucket. So every multiple of 6 you can potentialy hit F & craft a bucket
 			if Hero.wood % 6 == 0 then
-				Hero.bucket = Hero.bucket + 1
+				craft_bucket = true
 			end
+
+		else
+			tree_cut = false
 		end
 
 		----HERO CONTROLS (walk one by one, collide with solids, clear fog)
@@ -163,7 +167,7 @@ function Hero.Update(pMap, dt)
 				----
 
 				----HERO DIES - GAME OVER STATE - Hero.die is used in Game to pause hero update, make text, stop game music.
-				if pMap.isPlague(id) == true then
+				if pMap.isPlague(id) == true or Hero.energy == 0 then
 					Hero.die = true
 					Hero.energy = 0
 					Hero.sound_die:play()
