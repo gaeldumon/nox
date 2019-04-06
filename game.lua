@@ -151,7 +151,7 @@ function Game.Load()
           Game.Map.TILE_HEIGHT, 
           Game.tilesheet:getWidth(),
           Game.tilesheet:getHeight()
-          )
+        )
         id = id + 1
       end
     end

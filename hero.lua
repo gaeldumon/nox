@@ -10,6 +10,7 @@ Hero.cut = 0
 Hero.sound_cut = nil
 Hero.wood = 0
 Hero.bucket = 0
+Hero.sound_craftBucket = nil
 Hero.sound_getWood = nil
 Hero.energy = 10
 Hero.sound_energy = nil
@@ -30,6 +31,7 @@ function Hero.Load()
 	Hero.sound_cut:setVolume(0.5)
 	Hero.sound_getWood = love.audio.newSource('sounds/Shield.wav', 'static')
 	Hero.sound_getWood:setVolume(0.5)
+	Hero.sound_craftBucket = love.audio.newSource('sounds/craft.wav', 'static')
 	Hero.sound_hurt = love.audio.newSource('sounds/Hero_Hurt.wav', 'static')
 	Hero.sound_hurt:setVolume(0.2)
 	Hero.sound_energy = love.audio.newSource('sounds/energy.wav', 'static')
@@ -52,7 +54,7 @@ function Hero.Update(pMap, dt)
 		end
 		----
 
-		----HERO ACTIONS
+		----HERO ACTIONS - @BUG SOURCE -> Index a Map line that does not exist
 		Hero.actionID = pMap.Grid[Hero.line + 1][Hero.column]
 
 		if love.keyboard.isDown('c', 'd', 'f', 'v') then
@@ -81,10 +83,23 @@ function Hero.Update(pMap, dt)
 				----
 
 				----ACTION : CRAFT BUCKET
-				if love.keyboard.isDown('f') and craft_bucket == true then
-					Hero.bucket = Hero.bucket + 1
-					Hero.wood = Hero.wood - 6
-					craft_bucket = false
+				if love.keyboard.isDown('f') then
+					if craft_bucket == true then
+						Hero.bucket = Hero.bucket + 1
+						Hero.wood = Hero.wood - 6
+						Hero.sound_craftBucket:play()
+						craft_bucket = false
+					end
+				end
+				----
+
+				----ACTION : MAKE LAVA HARD
+				do
+					local id = pMap.Grid[Hero.line][Hero.column + 1]
+					if love.keyboard.isDown('v') and Hero.bucket > 0 and pMap.isLava(id) == true then
+						pMap.Grid[Hero.line][Hero.column + 1] = 53
+						Hero.bucket = Hero.bucket - 1
+					end
 				end
 				----
 
@@ -104,19 +119,24 @@ function Hero.Update(pMap, dt)
 		--It takes 3 strikes (press C) to take down 1 tree
 		if Hero.cut == 3 then
 			tree_cut = true
-			--One tree gives 3 wood logs
-			Hero.wood = Hero.wood + 3
-			Hero.cut = 0
-			--Replacing the tree tile by a grass tile (index 10, 10th position of the tilesheet) when tree is cut
-			pMap.Grid[Hero.line + 1][Hero.column] = 10
-			Hero.sound_getWood:play()
-			--It takes 6 wood logs to be able to craft a bucket. 2 trees = 1 bucket. So every multiple of 6 you can potentialy hit F & craft a bucket
-			if Hero.wood % 6 == 0 then
-				craft_bucket = true
-			end
-
 		else
 			tree_cut = false
+		end
+
+		if tree_cut == true then
+			--Replacing the tree tile by a grass tile (index 10, 10th position of the tilesheet) when tree is cut
+			pMap.Grid[Hero.line + 1][Hero.column] = 10
+			--One tree gives 3 wood logs
+			Hero.wood = Hero.wood + 3
+			Hero.sound_getWood:play()
+			Hero.cut = 0
+
+			--It takes 6 wood logs to be able to craft a bucket. 2 trees = 1 bucket. So every multiple of 6 you can potentialy hit F & craft a bucket
+			if Hero.wood % 6 == 0 or Hero.wood == 9 then
+				craft_bucket = true
+			else
+				craft_bucket = false
+			end
 		end
 
 		----HERO CONTROLS (walk one by one, collide with solids, clear fog)
