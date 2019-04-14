@@ -45,7 +45,7 @@ Game.Map.TILE_HEIGHT = 32
 Game.bottomPadding = 32
 Game.music = nil
 
-plague_count = 0
+plague_timer = 0
 
 function Game.Map.isSolid(pID)
     local tileType = Game.Map.TileTypes[pID]
@@ -199,10 +199,10 @@ function Game.Update(dt)
     Game.Hero.Update(Game.Map, dt)
 
     ----PLAGUE TILES TIMER
-    plague_count = plague_count + 60*dt
-    if plague_count >= 60 then
+    plague_timer = plague_timer + 60*dt
+    if plague_timer >= 60 then
         Game.Map.plague()
-        plague_count = 0
+        plague_timer = 0
     end
     ----
 end
