@@ -119,6 +119,7 @@ function Game.Map.clearFog(pLine, pCol)
     end
 end
 
+----Generate a "plague" tile at random coordinates
 function Game.Map.plague()
     local random_line = love.math.random(1, Game.Map.MAP_HEIGHT)
     local random_col = love.math.random(1, Game.Map.MAP_WIDTH)
