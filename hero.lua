@@ -14,7 +14,6 @@ Hero.wood = 0
 Hero.bucket = 0
 Hero.energy = 5
 Hero.die = false
-Hero.drink = false
 
 tree_cut = false
 craft_bucket = false
@@ -23,7 +22,6 @@ Hero.sound_cut = nil
 Hero.sound_craftBucket = nil
 Hero.sound_getWood = nil
 Hero.sound_waterOnLava = nil
-Hero.sound_energy = nil
 Hero.sound_die = nil
 Hero.sound_hurt = nil
 
@@ -33,16 +31,13 @@ function Hero.Load()
 	Hero.Frames[3] = love.graphics.newImage('images/player_3.png')
 	Hero.Frames[4] = love.graphics.newImage('images/player_4.png')
 
-	Hero.sound_cut = love.audio.newSource('sounds/Shield.wav', 'static')
+	Hero.sound_cut = love.audio.newSource('sounds/cut.wav', 'static')
 	Hero.sound_cut:setVolume(0.5)
-	Hero.sound_getWood = love.audio.newSource('sounds/Shield.wav', 'static')
-	Hero.sound_getWood:setVolume(0.5)
 	Hero.sound_craftBucket = love.audio.newSource('sounds/craft.wav', 'static')
 	Hero.sound_waterOnLava = love.audio.newSource('sounds/wateronlava.wav', 'static')
-	Hero.sound_hurt = love.audio.newSource('sounds/Hero_Hurt.wav', 'static')
+	Hero.sound_hurt = love.audio.newSource('sounds/hurt.wav', 'static')
 	Hero.sound_hurt:setVolume(0.2)
-	Hero.sound_energy = love.audio.newSource('sounds/energy.wav', 'static')
-	Hero.sound_die = love.audio.newSource('sounds/Scream.wav', 'static')
+	Hero.sound_die = love.audio.newSource('sounds/death.wav', 'static')
 end
 
 function Hero.Update(pMap, dt)
@@ -50,7 +45,6 @@ function Hero.Update(pMap, dt)
 	if Hero.die == false then
 
 		----HERO ANIMATION
-		--We increment by 0.1 to reduce animation speed (10 times slower than +1 incrementation)
 		if Hero.die == false then
 			Hero.currentFrame = Hero.currentFrame + ( 4 * dt)
 			if math.floor(Hero.currentFrame) > #Hero.Frames then
@@ -61,50 +55,53 @@ function Hero.Update(pMap, dt)
 		end
 		----
 
+		if Hero.cut == 3 then
+			tree_cut = true
+			pMap.Grid[Hero.line + 1][Hero.column] = 10
+			Hero.wood = Hero.wood + 3
+			Hero.cut = 0
+		else
+			tree_cut = false
+		end
+
+		if Hero.wood >= 6 then
+			craft_bucket = true
+		else
+			craft_bucket = false
+		end
+
 		----HERO ACTIONS - @BUG SOURCE -> Index a Map line that does not exist
 		Hero.actionID = pMap.Grid[Hero.line + 1][Hero.column]
 		Hero.lavaActionID = pMap.Grid[Hero.line][Hero.column + 1]
 
-		if love.keyboard.isDown('c', 'd', 'f', 'v') then
+		if love.keyboard.isDown('e', 'f') then
+
 			if Hero.actionPressed == false then
 
-				----ACTION : CUT TREE - PRESS C
-				if love.keyboard.isDown('c') then
+				----ACTIONS : CUT TREE, CRAFT A BUCKET, POOR WATER BUCKET ON LAVA
+				if love.keyboard.isDown('e') then
+
 					if pMap.isTree(Hero.actionID) == true then
 						Hero.cut = Hero.cut + 1
 						Hero.sound_cut:play()
-						print("Cuting")
 					end
-				end
-				----
 
-				----ACTION : DRINK WATER - PRESS D
-				if love.keyboard.isDown('d') then
-					if pMap.isWater(Hero.actionID) == true then
-						if Hero.energy < 10 then
-							Hero.energy = Hero.energy + 1
-							Hero.sound_energy:play()
-							print('Drinking')
-						end
+					if Hero.bucket > 0 and pMap.isLava(Hero.lavaActionID) == true then
+						pMap.Grid[Hero.line][Hero.column + 1] = 53
+						Hero.bucket = Hero.bucket - 1
+						Hero.sound_waterOnLava:play()
 					end
-				end
-				----
 
-				----ACTION : CRAFT BUCKET - PRESS F
+				end
+
 				if love.keyboard.isDown('f') then
+
 					if craft_bucket == true then
 						Hero.bucket = Hero.bucket + 1
 						Hero.wood = Hero.wood - 6
 						Hero.sound_craftBucket:play()
 					end
-				end
-				----
 
-				----ACTION : MAKE LAVA HARD - PRESS V
-				if love.keyboard.isDown('v') and Hero.bucket > 0 and pMap.isLava(Hero.lavaActionID) == true then
-					pMap.Grid[Hero.line][Hero.column + 1] = 53
-					Hero.bucket = Hero.bucket - 1
-					Hero.sound_waterOnLava:play()
 				end
 				----
 
@@ -120,26 +117,6 @@ function Hero.Update(pMap, dt)
 			Hero.cut = 0
 		end
 		----
-
-		--It takes 3 strikes (press C) to take down 1 tree
-		if Hero.cut == 3 then
-			tree_cut = true
-			--Replacing the tree tile by a grass tile (index 10, 10th position of the tilesheet) when tree is cut
-			pMap.Grid[Hero.line + 1][Hero.column] = 10
-			--One tree gives 3 wood logs : only this determine the possibility to make a bucket or not (1 bucket = 6 wood logs)
-			Hero.wood = Hero.wood + 3
-			Hero.sound_getWood:play()
-			Hero.cut = 0
-		else
-			tree_cut = false
-		end
-
-		--It takes 6 wood logs to be able to craft a bucket. 2 trees = 1 bucket. So every multiple of 6 you can potentialy hit F & craft a bucket
-		if Hero.wood > 0 and (Hero.wood % 6 == 0 or Hero.wood == 9) then
-			craft_bucket = true
-		else
-			craft_bucket = false
-		end
 
 		----HERO CONTROLS (walk one by one, collide with solids, clear fog)
 		if love.keyboard.isDown('up', 'right', 'down', 'left') then

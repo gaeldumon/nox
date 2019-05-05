@@ -47,6 +47,8 @@ Game.music = nil
 
 plague_timer = 0
 
+-----------------------------------------------HOMEMADE FUNCTIONS--------------------------------------------------
+
 function Game.Map.isSolid(pID)
     local tileType = Game.Map.TileTypes[pID]
     if tileType == 'sea' or tileType == 'tree' or tileType == 'cactus' or tileType == 'rock' then
@@ -128,15 +130,16 @@ function Game.Map.plague()
     end
 end
 
-function Game.Load()
-   Game.Hero.Load()
-   
-   Game.tilesheet = love.graphics.newImage('images/tilesheet.png')
-   Game.TileTextures[0] = nil
+------------------------------------------------------------------------------------------------------------------
 
-   Game.music = love.audio.newSource('sounds/cool.mp3', 'stream')
-   Game.music:setVolume(0.5)
-   Game.music:play()
+function Game.Load()
+
+   	Game.Hero.Load()
+   
+   	Game.tilesheet = love.graphics.newImage('images/tilesheet.png')
+   	Game.TileTextures[0] = nil
+
+   	Game.music = love.audio.newSource('sounds/cool.mp3', 'stream')
 
     --Reading/cuting each tilesheet tiles one by one : not related to the screen in any way
     local nb_cols = Game.tilesheet:getWidth() / Game.Map.TILE_WIDTH
@@ -144,17 +147,17 @@ function Game.Load()
     local l,c
     local id = 1
     for l = 1, nb_lines do
-      for c = 1, nb_cols do
-        Game.TileTextures[id] = love.graphics.newQuad(
-          (c - 1) * Game.Map.TILE_WIDTH, 
-          (l - 1) * Game.Map.TILE_HEIGHT, 
-          Game.Map.TILE_WIDTH, 
-          Game.Map.TILE_HEIGHT, 
-          Game.tilesheet:getWidth(),
-          Game.tilesheet:getHeight()
-        )
-        id = id + 1
-      end
+      	for c = 1, nb_cols do
+        	Game.TileTextures[id] = love.graphics.newQuad(
+	          	(c - 1) * Game.Map.TILE_WIDTH, 
+	          	(l - 1) * Game.Map.TILE_HEIGHT, 
+	          	Game.Map.TILE_WIDTH, 
+	          	Game.Map.TILE_HEIGHT, 
+	          	Game.tilesheet:getWidth(),
+	          	Game.tilesheet:getHeight()
+        	)
+        	id = id + 1
+      	end
     end
     ----
 
@@ -196,10 +199,14 @@ function Game.Load()
 end
 
 function Game.Update(dt)
+
     Game.Hero.Update(Game.Map, dt)
 
+	Game.music:setVolume(0.5)
+   	Game.music:play()
+
     ----PLAGUE TILES TIMER
-    plague_timer = plague_timer + 60*dt
+    plague_timer = plague_timer + 5 * 60*dt
     if plague_timer >= 60 then
         Game.Map.plague()
         plague_timer = 0
@@ -211,25 +218,26 @@ function Game.Draw()
     ----Drawing the actual textures "cut" off the tilesheet in Game.Load()
     local c, l
     for l = 1, Game.Map.MAP_HEIGHT do
-      for c = 1, Game.Map.MAP_WIDTH do
-        local id = Game.Map.Grid[l][c]
-        local texQuad = Game.TileTextures[id]
-        if texQuad ~= nil then
-            local x = (c - 1) * Game.Map.TILE_WIDTH
-            local y = (l - 1) * Game.Map.TILE_HEIGHT
-            love.graphics.draw(Game.tilesheet, texQuad, x, y)
-            --Drawing the fog
-            if Game.Map.FogGrid[l][c] > 0 then
-                love.graphics.setColor(0,0,0, Game.Map.FogGrid[l][c])
-                love.graphics.rectangle('fill', x, y, Game.Map.TILE_WIDTH, Game.Map.TILE_HEIGHT)
-                love.graphics.setColor(255,255,255)
-            end
-            ----
-        end
-      end
+      	for c = 1, Game.Map.MAP_WIDTH do
+        	local id = Game.Map.Grid[l][c]
+        	local texQuad = Game.TileTextures[id]
+        	if texQuad ~= nil then
+            	local x = (c - 1) * Game.Map.TILE_WIDTH
+            	local y = (l - 1) * Game.Map.TILE_HEIGHT
+            	love.graphics.draw(Game.tilesheet, texQuad, x, y)
+            	--Drawing the fog
+            	if Game.Map.FogGrid[l][c] > 0 then
+                	love.graphics.setColor(0,0,0, Game.Map.FogGrid[l][c])
+                	love.graphics.rectangle('fill', x, y, Game.Map.TILE_WIDTH, Game.Map.TILE_HEIGHT)
+                	love.graphics.setColor(255,255,255)
+            	end
+            	----
+       		end
+      	end
     end
     ----
 
+    --[[
     ----TILE MOUSEOVER THING
     local mouseX = love.mouse.getX()
     local mouseY = love.mouse.getY()
@@ -237,18 +245,19 @@ function Game.Draw()
     local col = math.floor(mouseX / Game.Map.TILE_WIDTH) + 1
     local line = math.floor(mouseY / Game.Map.TILE_HEIGHT) + 1
     if col > 0 and col <= Game.Map.MAP_WIDTH and line > 0 and line <= Game.Map.MAP_HEIGHT then
-      local id = Game.Map.Grid[line][col]
-      love.graphics.print("Type de tile : ".. tostring(Game.Map.TileTypes[id]) .. " (ID = " .. tostring(id) .. ")", 
-        GAME_WIDTH - 200, 
-        GAME_HEIGHT - Game.bottomPadding
+      	local id = Game.Map.Grid[line][col]
+      	love.graphics.print("Type de tile : ".. tostring(Game.Map.TileTypes[id]) .. " (ID = " .. tostring(id) .. ")", 
+        	GAME_WIDTH - 200, 
+        	GAME_HEIGHT - Game.bottomPadding
         )
     else
-      love.graphics.print("Hors du tableau !", 
-        GAME_WIDTH - 200, 
-        GAME_HEIGHT - Game.bottomPadding
+      	love.graphics.print("Hors du tableau !", 
+        	GAME_WIDTH - 200, 
+        	GAME_HEIGHT - Game.bottomPadding
         )
     end
     ----
+    ]]
 
     Game.Hero.Draw(Game.Map)
 
@@ -262,14 +271,14 @@ function Game.Draw()
     ----
 
     ----Printing Hero stats and inventory
-    local str_wood = "BUCHES DE BOIS : " .. tostring(Game.Hero.wood)
-    love.graphics.print(str_wood, 10, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
+    local str_wood = "LIFE : " .. tostring(Game.Hero.energy)
+    love.graphics.print(str_wood, 32, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
 
-    local str_stats = "ENERGIE : " .. tostring(Game.Hero.energy)
-    love.graphics.print(str_stats, 232, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
+    local str_stats = "WOOD : " .. tostring(Game.Hero.wood)
+    love.graphics.print(str_stats, 142, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
 
-    local str_bucket = "SEAU : " .. tostring(Game.Hero.bucket)
-    love.graphics.print(str_bucket, 400, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
+    local str_bucket = "WATER BUCKET : " .. tostring(Game.Hero.bucket)
+    love.graphics.print(str_bucket, 274, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
     ----
 end
 
