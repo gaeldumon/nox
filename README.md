@@ -1,7 +1,7 @@
 # Game Dev Journey
 
-### Week #3
+### Part#1 - Lua and Love2D
 
-You have to run, with LÖVE
+"Get the fuck out!" prototype
 
 ![Screenshot](screenshot/screenshot_wstilemaps.png)
