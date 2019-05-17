@@ -1,95 +1,79 @@
-local Hero = {}
+local hero = {}
 
-Hero.Frames = {}
-Hero.currentFrame = 1
+hero.Frames = {}
+hero.currentFrame = 1
 
-Hero.line = 1
-Hero.column = 1
+hero.line = 2
+hero.column = 2
 
-Hero.keyPressed = false
-Hero.actionPressed = false
+hero.keyPressed = false
+hero.actionPressed = false
 
-Hero.cut = 0
-Hero.wood = 0
-Hero.bucket = 0
-Hero.energy = 5
-Hero.die = false
+hero.cut = 0
+hero.wood = 0
+hero.bucket = 0
+hero.energy = 5
+
+hero.die = false
 
 tree_cut = false
 craft_bucket = false
 
-Hero.sound_cut = nil
-Hero.sound_craftBucket = nil
-Hero.sound_getWood = nil
-Hero.sound_waterOnLava = nil
-Hero.sound_die = nil
-Hero.sound_hurt = nil
+hero.sound_cut = nil
+hero.sound_craftBucket = nil
+hero.sound_getWood = nil
+hero.sound_waterOnLava = nil
+hero.sound_die = nil
+hero.sound_hurt = nil
 
-function Hero.Load()
-	Hero.Frames[1] = love.graphics.newImage('images/player_1.png')
-	Hero.Frames[2] = love.graphics.newImage('images/player_2.png')
-	Hero.Frames[3] = love.graphics.newImage('images/player_3.png')
-	Hero.Frames[4] = love.graphics.newImage('images/player_4.png')
+function hero.Load()
+	hero.Frames[1] = love.graphics.newImage('images/player_1.png')
+	hero.Frames[2] = love.graphics.newImage('images/player_2.png')
+	hero.Frames[3] = love.graphics.newImage('images/player_3.png')
+	hero.Frames[4] = love.graphics.newImage('images/player_4.png')
 
-	Hero.sound_cut = love.audio.newSource('sounds/cut.wav', 'static')
-	Hero.sound_cut:setVolume(0.5)
-	Hero.sound_craftBucket = love.audio.newSource('sounds/craft.wav', 'static')
-	Hero.sound_waterOnLava = love.audio.newSource('sounds/wateronlava.wav', 'static')
-	Hero.sound_hurt = love.audio.newSource('sounds/hurt.wav', 'static')
-	Hero.sound_hurt:setVolume(0.2)
-	Hero.sound_die = love.audio.newSource('sounds/death.wav', 'static')
+	hero.sound_cut = love.audio.newSource('sounds/cut.wav', 'static')
+	hero.sound_cut:setVolume(0.5)
+	hero.sound_craftBucket = love.audio.newSource('sounds/craft.wav', 'static')
+	hero.sound_waterOnLava = love.audio.newSource('sounds/wateronlava.wav', 'static')
+	hero.sound_hurt = love.audio.newSource('sounds/hurt.wav', 'static')
+	hero.sound_hurt:setVolume(0.2)
+	hero.sound_die = love.audio.newSource('sounds/death.wav', 'static')
 end
 
-function Hero.Update(pMap, dt)
+function hero.Update(pMap, dt)
 
-	if Hero.die == false then
+	if hero.die == false then
 
 		----HERO ANIMATION
-		if Hero.die == false then
-			Hero.currentFrame = Hero.currentFrame + ( 4 * dt)
-			if math.floor(Hero.currentFrame) > #Hero.Frames then
-				Hero.currentFrame = 1
-			end
-		else
-			Hero.currentFrame = 1
+		hero.currentFrame = hero.currentFrame + ( 4 * dt)
+		if math.floor(hero.currentFrame) > #hero.Frames then
+			hero.currentFrame = 1
 		end
 		----
 
-		if Hero.cut == 3 then
-			tree_cut = true
-			pMap.Grid[Hero.line + 1][Hero.column] = 10
-			Hero.wood = Hero.wood + 3
-			Hero.cut = 0
-		else
-			tree_cut = false
-		end
-
-		if Hero.wood >= 6 then
-			craft_bucket = true
-		else
-			craft_bucket = false
-		end
-
 		----HERO ACTIONS - @BUG SOURCE -> Index a Map line that does not exist
-		Hero.actionID = pMap.Grid[Hero.line + 1][Hero.column]
-		Hero.lavaActionID = pMap.Grid[Hero.line][Hero.column + 1]
+		hero.actionID = pMap.grid[hero.line + 1][hero.column]
+		hero.lavaActionID = pMap.grid[hero.line][hero.column + 1]
 
 		if love.keyboard.isDown('e', 'f') then
 
-			if Hero.actionPressed == false then
+			if hero.actionPressed == false then
 
 				----ACTIONS : CUT TREE, CRAFT A BUCKET, POOR WATER BUCKET ON LAVA
 				if love.keyboard.isDown('e') then
 
-					if pMap.isTree(Hero.actionID) == true then
-						Hero.cut = Hero.cut + 1
-						Hero.sound_cut:play()
+					if pMap.isTree(hero.actionID) == true then
+						hero.cut = hero.cut + 1
+						hero.sound_cut:play()
 					end
 
-					if Hero.bucket > 0 and pMap.isLava(Hero.lavaActionID) == true then
-						pMap.Grid[Hero.line][Hero.column + 1] = 53
-						Hero.bucket = Hero.bucket - 1
-						Hero.sound_waterOnLava:play()
+					if pMap.isLava(hero.lavaActionID) == true then
+						if hero.bucket > 0 then
+							pMap.grid[hero.line][hero.column + 1] = 53
+							hero.bucket = hero.bucket - 1
+							hero.sound_waterOnLava:play()
+						end
 					end
 
 				end
@@ -97,97 +81,117 @@ function Hero.Update(pMap, dt)
 				if love.keyboard.isDown('f') then
 
 					if craft_bucket == true then
-						Hero.bucket = Hero.bucket + 1
-						Hero.wood = Hero.wood - 6
-						Hero.sound_craftBucket:play()
+						hero.bucket = hero.bucket + 1
+						hero.wood = hero.wood - 6
+						hero.sound_craftBucket:play()
 					end
 
 				end
 				----
 
-				Hero.actionPressed = true
+				hero.actionPressed = true
 			end
 		else
-			Hero.actionPressed = false
+			hero.actionPressed = false
 		end
 		----
+
+		if hero.cut == 3 then
+			tree_cut = true
+			pMap.grid[hero.line + 1][hero.column] = 10
+			hero.wood = hero.wood + 3
+			hero.cut = 0
+		else
+			tree_cut = false
+		end
+
+		if hero.wood >= 6 then
+			craft_bucket = true
+		else
+			craft_bucket = false
+		end
 
 		----Reseting strike counter when you change tree
-		if pMap.isTree(Hero.actionID) == false then
-			Hero.cut = 0
+		if pMap.isTree(hero.actionID) == false then
+			hero.cut = 0
 		end
 		----
 
-		----HERO CONTROLS (walk one by one, collide with solids, clear fog)
+		----HERO DIES - GAME OVER STATE - hero.die is used in Game to pause hero update, make text, stop game music.
+		do
+			local id = pMap.grid[hero.line][hero.column]
+			if pMap.isPlague(id) == true or hero.energy == 0 then
+				hero.die = true
+				hero.energy = 0
+				hero.sound_die:play()
+			end
+		end
+		----
+
+		----HERO CONTROLS AND COLLISIONS
 		if love.keyboard.isDown('up', 'right', 'down', 'left') then
 
-			if Hero.keyPressed == false then
+			if hero.keyPressed == false then
 
-				local old_column = Hero.column
-				local old_line = Hero.line
+				local old_column = hero.column
+				local old_line = hero.line
 
-				if love.keyboard.isDown('up') and Hero.line > 1 then
-					Hero.line = Hero.line - 1
+				if love.keyboard.isDown('up') and hero.line > 1 then
+					hero.line = hero.line - 1
 				end
 
-				if love.keyboard.isDown('right') and Hero.column < pMap.MAP_WIDTH then
-					Hero.column = Hero.column + 1
+				if love.keyboard.isDown('right') and hero.column < pMap.MAP_WIDTH then
+					hero.column = hero.column + 1
 				end
 
-				if love.keyboard.isDown('down') and Hero.line < pMap.MAP_HEIGHT then
-					Hero.line = Hero.line + 1
+				if love.keyboard.isDown('down') and hero.line < pMap.MAP_HEIGHT then
+					hero.line = hero.line + 1
 				end
 
-				if love.keyboard.isDown('left') and Hero.column > 1 then
-					Hero.column = Hero.column - 1
+				if love.keyboard.isDown('left') and hero.column > 1 then
+					hero.column = hero.column - 1
 				end
 
-				local id = pMap.Grid[Hero.line][Hero.column]
+				local id = pMap.grid[hero.line][hero.column]
 
-				----On keyboard push Hero collides with solid tiles : hero stays on his "previous" tile
+				----On keyboard push hero collides with solid tiles : hero stays on his "previous" tile
 				if pMap.isSolid(id) == true then
-					Hero.column = old_column
-					Hero.line = old_line
-					print("Collision avec : " .. pMap.TileTypes[id])
+					hero.column = old_column
+					hero.line = old_line
 				else
-					pMap.clearFog(Hero.line, Hero.column)
+					pMap.clearFog(hero.line, hero.column)
 				end
 				----
 
 				----On keyboard push if the hero collides with tiles that hurt him (cactus, lava)
 				if pMap.isCactus(id) == true or pMap.isLava(id) == true then
-					if Hero.energy > 0 then
-						Hero.energy = Hero.energy - 1
+					if hero.energy > 0 then
+						hero.energy = hero.energy - 1
 					else
-						Hero.energy = 0
+						hero.energy = 0
 					end
-					Hero.sound_hurt:play()
+					hero.sound_hurt:play()
 				end
 				----
 
-				----HERO DIES - GAME OVER STATE - Hero.die is used in Game to pause hero update, make text, stop game music.
-				if pMap.isPlague(id) == true or Hero.energy == 0 then
-					Hero.die = true
-					Hero.energy = 0
-					Hero.sound_die:play()
-				end
-				----
-
-				Hero.keyPressed = true
+				hero.keyPressed = true
 			end
 		else
-			Hero.keyPressed = false
+			hero.keyPressed = false
 		end
 		----
 
+	else
+		hero.currentFrame = 1
 	end
 
 end
 
-function Hero.Draw(pMap)
-	local x = (Hero.column - 1) * pMap.TILE_WIDTH
-	local y = (Hero.line - 1) * pMap.TILE_HEIGHT
-	love.graphics.draw(Hero.Frames[math.floor(Hero.currentFrame)], x, y, 0, 2, 2)
+function hero.Draw(pMap)
+	local x = (hero.column - 1) * pMap.TILE_WIDTH
+	local y = (hero.line - 1) * pMap.TILE_HEIGHT
+	local hero_h = hero.Frames[math.floor(hero.currentFrame)]:getHeight()
+	love.graphics.draw(hero.Frames[math.floor(hero.currentFrame)], x, y-hero_h/2, 0, 2, 2)
 end
 
-return Hero
+return hero

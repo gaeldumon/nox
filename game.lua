@@ -1,15 +1,18 @@
-local Game = {}
+local def = require('define')
+local transition = require('transition')
 
-Game.Hero = require('hero')
+local game = {}
 
-Game.Map = {}
-Game.Map.Grid = {}
-Game.Map.FogGrid = {}
-Game.tilesheet = nil
-Game.TileTextures = {}
-Game.Map.TileTypes = {}
+game.hero = require('hero')
 
-Game.Map.Grid = {
+game.map = {}
+game.map.grid = {}
+game.map.fogGrid = {}
+game.tilesheet = nil
+game.tileTextures = {}
+game.map.tileTypes = {}
+
+game.map.grid = {
     { 10,10,10,10,10,10,10,10,10,61,10,13,10,10,10,10,10,10,13,14,15,15,15,15,15,15,15,15,15,15,15,15   },
     { 10,10,10,10,10,11,11,11,10,10,10,13,10,10,10,10,10,10,10,14,15,15,129,15,15,15,15,15,15,68,15,15  },
     { 10,10,61,10,11,19,19,19,11,10,10,13,10,10,169,10,10,10,10,13,14,15,15,15,15,15,15,15,15,15,15,15  },
@@ -35,22 +38,21 @@ Game.Map.Grid = {
     { 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,1,37,37,37    }
 }
 
-Game.Map.FogGrid = {}
+game.map.fogGrid = {}
 
-Game.Map.MAP_WIDTH = 32
-Game.Map.MAP_HEIGHT = 23
-Game.Map.TILE_WIDTH = 32
-Game.Map.TILE_HEIGHT = 32
+game.map.MAP_WIDTH = 32
+game.map.MAP_HEIGHT = 23
+game.map.TILE_WIDTH = 32
+game.map.TILE_HEIGHT = 32
 
-Game.bottomPadding = 32
-Game.music = nil
+game.music = nil
 
-plague_timer = 0
+timer_plague = 0
 
 -----------------------------------------------HOMEMADE FUNCTIONS--------------------------------------------------
 
-function Game.Map.isSolid(pID)
-    local tileType = Game.Map.TileTypes[pID]
+function game.map.isSolid(pID)
+    local tileType = game.map.tileTypes[pID]
     if tileType == 'sea' or tileType == 'tree' or tileType == 'cactus' or tileType == 'rock' then
         return true
     end
@@ -58,8 +60,8 @@ function Game.Map.isSolid(pID)
     return false
 end
 
-function Game.Map.isTree(pID)
-    local tileType = Game.Map.TileTypes[pID]
+function game.map.isTree(pID)
+    local tileType = game.map.tileTypes[pID]
     if tileType == 'tree' then
         return true
     end
@@ -67,8 +69,8 @@ function Game.Map.isTree(pID)
     return false
 end
 
-function Game.Map.isWater(pID)
-    local tileType = Game.Map.TileTypes[pID]
+function game.map.isWater(pID)
+    local tileType = game.map.tileTypes[pID]
     if tileType == 'water' then
         return true
     end
@@ -76,8 +78,8 @@ function Game.Map.isWater(pID)
     return false
 end
 
-function Game.Map.isCactus(pID)
-    local tileType = Game.Map.TileTypes[pID]
+function game.map.isCactus(pID)
+    local tileType = game.map.tileTypes[pID]
     if tileType == 'cactus' then
         return true
     end
@@ -85,8 +87,8 @@ function Game.Map.isCactus(pID)
     return false
 end
 
-function Game.Map.isLava(pID)
-    local tileType = Game.Map.TileTypes[pID]
+function game.map.isLava(pID)
+    local tileType = game.map.tileTypes[pID]
     if tileType == 'lava' then
         return true
     end
@@ -94,8 +96,8 @@ function Game.Map.isLava(pID)
     return false
 end
 
-function Game.Map.isPlague(pID)
-    local tileType = Game.Map.TileTypes[pID]
+function game.map.isPlague(pID)
+    local tileType = game.map.tileTypes[pID]
     if tileType == 'plague' then
         return true
     end
@@ -103,17 +105,27 @@ function Game.Map.isPlague(pID)
     return false
 end
 
-function Game.Map.clearFog(pLine, pCol)
+function game.map.loadFog(pMap)
+	local l,c
+    for l = 1, pMap.MAP_HEIGHT do
+        pMap.fogGrid[l] = {}
+        for c = 1, pMap.MAP_WIDTH do
+            pMap.fogGrid[l][c] = 1
+        end
+    end
+end
+
+function game.map.clearFog(pLine, pCol)
     --print("Clear fog!")
     local c,l
-    for l = 1, Game.Map.MAP_HEIGHT do
-        for c = 1, Game.Map.MAP_WIDTH do
-            if l > 0 and l <= Game.Map.MAP_HEIGHT and c > 0 and c <= Game.Map.MAP_WIDTH then
+    for l = 1, game.map.MAP_HEIGHT do
+        for c = 1, game.map.MAP_WIDTH do
+            if l > 0 and l <= game.map.MAP_HEIGHT and c > 0 and c <= game.map.MAP_WIDTH then
                 local dist = math.dist(c, l, pCol, pLine)
                 if dist < 5 then
                     local alpha = dist / 5
-                    if Game.Map.FogGrid[l][c] > alpha then
-                        Game.Map.FogGrid[l][c] = alpha
+                    if game.map.fogGrid[l][c] > alpha then
+                        game.map.fogGrid[l][c] = alpha
                     end
                 end
             end
@@ -122,164 +134,167 @@ function Game.Map.clearFog(pLine, pCol)
 end
 
 ----Generate a "plague" tile at random coordinates
-function Game.Map.plague()
-    local random_line = love.math.random(1, Game.Map.MAP_HEIGHT)
-    local random_col = love.math.random(1, Game.Map.MAP_WIDTH)
-    if Game.Map.Grid[random_line][random_col] ~= 76 then
-        Game.Map.Grid[random_line][random_col] = 76
+function game.makePlague(pMap)
+    local random_line = love.math.random(1, pMap.MAP_HEIGHT)
+    local random_col = love.math.random(1, pMap.MAP_WIDTH)
+    if pMap.grid[random_line][random_col] ~= 76 then
+        pMap.grid[random_line][random_col] = 76
+    end
+end
+
+function game.map.mouseover(pMap)
+	local mouseX = love.mouse.getX()
+    local mouseY = love.mouse.getY()
+    --We add one because of 1-based tables in lua (instead of 0)
+    local col = math.floor(mouseX / pMap.TILE_WIDTH) + 1
+    local line = math.floor(mouseY / pMap.TILE_HEIGHT) + 1
+    if col > 0 and col <= pMap.MAP_WIDTH and line > 0 and line <= pMap.MAP_HEIGHT then
+      	local id = pMap.grid[line][col]
+      	print("Type de tile = ".. tostring(pMap.tileTypes[id]) .. " (ID = " .. tostring(id) .. ")")
+    else
+      	print("Hors du tableau")
+    end
+end
+
+function game.loadTextures(pTilesheet, pTableTextures, pMap)
+    local nb_cols = pTilesheet:getWidth() / pMap.TILE_WIDTH
+    local nb_lines = pTilesheet:getHeight() / pMap.TILE_HEIGHT
+    local l,c
+    local id = 1
+    for l = 1, nb_lines do
+      	for c = 1, nb_cols do
+        	pTableTextures[id] = love.graphics.newQuad(
+	          	(c - 1) * pMap.TILE_WIDTH, 
+	          	(l - 1) * pMap.TILE_HEIGHT, 
+	          	pMap.TILE_WIDTH, 
+	          	pMap.TILE_HEIGHT, 
+	          	pTilesheet:getWidth(),
+	          	pTilesheet:getHeight()
+        	)
+        	id = id + 1
+      	end
+    end
+end
+
+function game.drawTextures(pMap, pTableTextures, pTilesheet)
+	----Drawing the actual textures "cut" off the tilesheet
+    local c, l
+    for l = 1, pMap.MAP_HEIGHT do
+      	for c = 1, pMap.MAP_WIDTH do
+        	local id = pMap.grid[l][c]
+        	local texQuad = pTableTextures[id]
+        	if texQuad ~= nil then
+            	local x = (c - 1) * pMap.TILE_WIDTH
+            	local y = (l - 1) * pMap.TILE_HEIGHT
+            	love.graphics.draw(pTilesheet, texQuad, x, y)
+       		end
+      	end
+    end
+end
+
+function game.drawFog(pMap, pTableTextures, pTilesheet)
+    local c, l
+    for l = 1, pMap.MAP_HEIGHT do
+      	for c = 1, pMap.MAP_WIDTH do
+        	local id = pMap.grid[l][c]
+      		local texQuad = pTableTextures[id]
+        	if texQuad ~= nil then
+            	local x = (c - 1) * pMap.TILE_WIDTH
+            	local y = (l - 1) * pMap.TILE_HEIGHT
+
+            	if pMap.fogGrid[l][c] > 0 then
+                	love.graphics.setColor(0,0,0, pMap.fogGrid[l][c])
+                	love.graphics.rectangle('fill', x, y, pMap.TILE_WIDTH, pMap.TILE_HEIGHT)
+                	love.graphics.setColor(255,255,255)
+            	end
+       		end
+      	end
     end
 end
 
 ------------------------------------------------------------------------------------------------------------------
 
-function Game.Load()
+function game.Load()
 
-   	Game.Hero.Load()
+   	game.hero.Load()
+
+   	game.music = love.audio.newSource('sounds/cool.mp3', 'stream')
+   	game.music:setVolume(0)
    
-   	Game.tilesheet = love.graphics.newImage('images/tilesheet.png')
-   	Game.TileTextures[0] = nil
+   	game.tilesheet = love.graphics.newImage('images/tilesheet.png')
+   	game.tileTextures[0] = nil
 
-   	Game.music = love.audio.newSource('sounds/cool.mp3', 'stream')
+   	game.loadTextures(game.tilesheet, game.tileTextures, game.map)
 
-    --Reading/cuting each tilesheet tiles one by one : not related to the screen in any way
-    local nb_cols = Game.tilesheet:getWidth() / Game.Map.TILE_WIDTH
-    local nb_lines = Game.tilesheet:getHeight() / Game.Map.TILE_HEIGHT
-    local l,c
-    local id = 1
-    for l = 1, nb_lines do
-      	for c = 1, nb_cols do
-        	Game.TileTextures[id] = love.graphics.newQuad(
-	          	(c - 1) * Game.Map.TILE_WIDTH, 
-	          	(l - 1) * Game.Map.TILE_HEIGHT, 
-	          	Game.Map.TILE_WIDTH, 
-	          	Game.Map.TILE_HEIGHT, 
-	          	Game.tilesheet:getWidth(),
-	          	Game.tilesheet:getHeight()
-        	)
-        	id = id + 1
-      	end
-    end
+    --Attributing a name for each used tile (used for the tile mouseover thing in draw and collisions with hero)
+    game.map.tileTypes[1] = 'gravel'
+    game.map.tileTypes[10] = 'grass'
+    game.map.tileTypes[11] = 'grass'
+    game.map.tileTypes[13] = 'sand'
+    game.map.tileTypes[14] = 'sand'
+    game.map.tileTypes[15] = 'sand'
+    game.map.tileTypes[19] = 'water'
+    game.map.tileTypes[20] = 'water'
+    game.map.tileTypes[21] = 'sea'
+    game.map.tileTypes[37] = 'lava'
+    game.map.tileTypes[55] = 'tree'
+    game.map.tileTypes[58] = 'tree'
+    game.map.tileTypes[61] = 'tree'
+    game.map.tileTypes[68] = 'cactus'
+    game.map.tileTypes[129] = 'rock'
+    game.map.tileTypes[142] = 'tree'
+    game.map.tileTypes[169] = 'rock'
+    game.map.tileTypes[76] = 'plague'
     ----
 
-    print("Game: loading textures...")
-    --Attributing a name for each used tile (used for the tile mouseover thing in draw and collisions with Hero)
-    Game.Map.TileTypes[1] = 'gravel'
-    Game.Map.TileTypes[10] = 'grass'
-    Game.Map.TileTypes[11] = 'grass'
-    Game.Map.TileTypes[13] = 'sand'
-    Game.Map.TileTypes[14] = 'sand'
-    Game.Map.TileTypes[15] = 'sand'
-    Game.Map.TileTypes[19] = 'water'
-    Game.Map.TileTypes[20] = 'water'
-    Game.Map.TileTypes[21] = 'sea'
-    Game.Map.TileTypes[37] = 'lava'
-    Game.Map.TileTypes[55] = 'tree'
-    Game.Map.TileTypes[58] = 'tree'
-    Game.Map.TileTypes[61] = 'tree'
-    Game.Map.TileTypes[68] = 'cactus'
-    Game.Map.TileTypes[129] = 'rock'
-    Game.Map.TileTypes[142] = 'tree'
-    Game.Map.TileTypes[169] = 'rock'
-    Game.Map.TileTypes[76] = 'plague'
-    ----
-    print("Game: textures successfuly loaded.")
-
-    print("Game: creation of the fog...")
-    Game.Map.FogGrid = {}
-    local l,c
-    for l = 1, Game.Map.MAP_HEIGHT do
-        Game.Map.FogGrid[l] = {}
-        for c = 1, Game.Map.MAP_WIDTH do
-            Game.Map.FogGrid[l][c] = 1
-        end
-    end
-    print("Game: fog successfuly created")
-
-    Game.Map.clearFog(Game.Hero.line, Game.Hero.column)
+    game.map.loadFog(game.map)
+    game.map.clearFog(game.hero.line, game.hero.column)
 end
 
-function Game.Update(dt)
+function game.Update(dt)
 
-    Game.Hero.Update(Game.Map, dt)
+	game.music:play()
 
-	Game.music:setVolume(0.5)
-   	Game.music:play()
+	transition.screenFadeout(dt)
+	transition.musicFadeout(dt, game.music, 0.5)
 
-    ----PLAGUE TILES TIMER
-    plague_timer = plague_timer + 5 * 60*dt
-    if plague_timer >= 60 then
-        Game.Map.plague()
-        plague_timer = 0
-    end
-    ----
+    game.hero.Update(game.map, dt)
+
+   	timer_plague = timer_plague + 5 * (60*dt)
+   	if timer_plague >= 100 then
+   		game.makePlague(game.map)
+   		timer_plague = 0
+   	end
+
+    if game.hero.die == true then
+		game.music:stop()
+		def.current_screen = 'gameover'
+	end
+
 end
 
-function Game.Draw()
-    ----Drawing the actual textures "cut" off the tilesheet in Game.Load()
-    local c, l
-    for l = 1, Game.Map.MAP_HEIGHT do
-      	for c = 1, Game.Map.MAP_WIDTH do
-        	local id = Game.Map.Grid[l][c]
-        	local texQuad = Game.TileTextures[id]
-        	if texQuad ~= nil then
-            	local x = (c - 1) * Game.Map.TILE_WIDTH
-            	local y = (l - 1) * Game.Map.TILE_HEIGHT
-            	love.graphics.draw(Game.tilesheet, texQuad, x, y)
-            	--Drawing the fog
-            	if Game.Map.FogGrid[l][c] > 0 then
-                	love.graphics.setColor(0,0,0, Game.Map.FogGrid[l][c])
-                	love.graphics.rectangle('fill', x, y, Game.Map.TILE_WIDTH, Game.Map.TILE_HEIGHT)
-                	love.graphics.setColor(255,255,255)
-            	end
-            	----
-       		end
-      	end
-    end
-    ----
+function game.Draw()
 
-    --[[
-    ----TILE MOUSEOVER THING
-    local mouseX = love.mouse.getX()
-    local mouseY = love.mouse.getY()
-    --We add one because of 1-based tables in lua (instead of 0)
-    local col = math.floor(mouseX / Game.Map.TILE_WIDTH) + 1
-    local line = math.floor(mouseY / Game.Map.TILE_HEIGHT) + 1
-    if col > 0 and col <= Game.Map.MAP_WIDTH and line > 0 and line <= Game.Map.MAP_HEIGHT then
-      	local id = Game.Map.Grid[line][col]
-      	love.graphics.print("Type de tile : ".. tostring(Game.Map.TileTypes[id]) .. " (ID = " .. tostring(id) .. ")", 
-        	GAME_WIDTH - 200, 
-        	GAME_HEIGHT - Game.bottomPadding
-        )
-    else
-      	love.graphics.print("Hors du tableau !", 
-        	GAME_WIDTH - 200, 
-        	GAME_HEIGHT - Game.bottomPadding
-        )
-    end
-    ----
-    ]]
+    game.drawTextures(game.map, game.tileTextures, game.tilesheet)
+    game.drawFog(game.map, game.tileTextures, game.tilesheet)
+	game.hero.Draw(game.map)
 
-    Game.Hero.Draw(Game.Map)
+    do
+    	local padding_bottom = 32
+	    ----Printing hero stats and inventory
+	    local str_wood = "LIFE : " .. tostring(game.hero.energy)
+	    love.graphics.print(str_wood, 32, def.SCREEN_HEIGHT - padding_bottom, 0, 1.5, 1.5)
 
-    ----HERO DIES - GAME OVER STATE - inducted in Hero (if Hero walks on plague tile) with the help of Game.Map.isPlague()
-    if Game.Hero.die == true then
-        Game.music:stop()
-        love.graphics.setColor(223,0,0)
-        love.graphics.print("YOU DEAD !", GAME_WIDTH / 2 - 200, GAME_HEIGHT / 2, 0, 5, 5)
-        love.graphics.setColor(255,255,255)
-    end
-    ----
+	    local str_stats = "WOOD : " .. tostring(game.hero.wood)
+	    love.graphics.print(str_stats, 142, def.SCREEN_HEIGHT - padding_bottom, 0, 1.5, 1.5)
 
-    ----Printing Hero stats and inventory
-    local str_wood = "LIFE : " .. tostring(Game.Hero.energy)
-    love.graphics.print(str_wood, 32, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
+	    local str_bucket = "WATER BUCKET : " .. tostring(game.hero.bucket)
+	    love.graphics.print(str_bucket, 274, def.SCREEN_HEIGHT - padding_bottom, 0, 1.5, 1.5)
+	    ----
+	end
 
-    local str_stats = "WOOD : " .. tostring(Game.Hero.wood)
-    love.graphics.print(str_stats, 142, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
+	transition.drawFadeout()
 
-    local str_bucket = "WATER BUCKET : " .. tostring(Game.Hero.bucket)
-    love.graphics.print(str_bucket, 274, GAME_HEIGHT - Game.bottomPadding, 0, 1.5, 1.5)
-    ----
 end
 
-return Game
+return game

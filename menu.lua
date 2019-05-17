@@ -1,11 +1,13 @@
+local def = require('define')
+
 local menu = {}
 
 local rain = {}
 counter = 0
 
-function MakeRain()
+function makeRain()
 	local drop = {}
-	drop.x = love.math.random(GAME_WIDTH / 2 - 200, GAME_WIDTH / 2 + 200)
+	drop.x = love.math.random(def.SCREEN_WIDTH / 4, def.SCREEN_WIDTH / 1.4)
 	drop.y = 0
 	drop.vy = 0
 	drop.gravity = 6
@@ -25,7 +27,7 @@ function menu.Update(dt)
 	counter = counter + 1 * (60*dt)
 
 	if counter >= 5 then
-		MakeRain()
+		makeRain()
 		counter = 0
 	end
 
@@ -34,9 +36,8 @@ function menu.Update(dt)
 		drop.vy = drop.gravity * (60*dt)
 		drop.y = drop.y + drop.vy
 
-		if drop.y > GAME_HEIGHT then
-			drop.delete = true
-			table.remove(rain, i)
+		if drop.y > def.SCREEN_HEIGHT + drop.height then
+			drop.y = 0
 		end
 	end
 end
