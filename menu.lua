@@ -36,8 +36,9 @@ function menu.Update(dt)
 		drop.vy = drop.gravity * (60*dt)
 		drop.y = drop.y + drop.vy
 
-		if drop.y > def.SCREEN_HEIGHT + drop.height then
-			drop.y = 0
+		if drop.y > def.SCREEN_HEIGHT then
+			drop.delete = true
+			table.remove(rain, i)
 		end
 	end
 end
@@ -47,7 +48,9 @@ function menu.Draw()
 
 	local i
 	for i, drop in ipairs(rain) do
-		love.graphics.rectangle('fill', drop.x, drop.y, drop.width, drop.height)
+		if drop.delete == false then
+			love.graphics.rectangle('fill', drop.x, drop.y, drop.width, drop.height)
+		end
 	end
 end
 

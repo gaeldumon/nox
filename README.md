@@ -4,4 +4,6 @@
 
 "Get the fuck out!" prototype
 
-![Screenshot](screenshot/screenshot_wstilemaps.png)
+![Screenshot](screenshot/nox-1.png)
+
+![Screenshot](screenshot/nox-2.png)
