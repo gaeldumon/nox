@@ -36,7 +36,7 @@ function menu.Update(dt)
 		drop.vy = drop.gravity * (60*dt)
 		drop.y = drop.y + drop.vy
 
-		if drop.y > def.SCREEN_HEIGHT then
+		if drop.y > def.SCREEN_HEIGHT + drop.y then
 			drop.delete = true
 			table.remove(rain, i)
 		end
