@@ -13,6 +13,7 @@ hero.cut = 0
 hero.wood = 0
 hero.bucket = 0
 hero.energy = 5
+hero.escape = false
 
 hero.die = false
 
@@ -36,6 +37,7 @@ function hero.Load()
 	hero.sound_cut:setVolume(0.5)
 	hero.sound_craftBucket = love.audio.newSource('sounds/craft.wav', 'static')
 	hero.sound_waterOnLava = love.audio.newSource('sounds/wateronlava.wav', 'static')
+	hero.sound_waterOnLava:setVolume(0.3)
 	hero.sound_hurt = love.audio.newSource('sounds/hurt.wav', 'static')
 	hero.sound_hurt:setVolume(0.2)
 	hero.sound_die = love.audio.newSource('sounds/death.wav', 'static')
@@ -140,8 +142,12 @@ function hero.Update(pMap, dt)
 					hero.line = hero.line - 1
 				end
 
-				if love.keyboard.isDown('right') and hero.column < pMap.MAP_WIDTH then
+				if love.keyboard.isDown('right') and hero.column < pMap.MAP_WIDTH or hero.line > 12 then
 					hero.column = hero.column + 1
+					if hero.column > pMap.MAP_WIDTH then
+						hero.escape = true
+						hero.column = 1
+					end
 				end
 
 				if love.keyboard.isDown('down') and hero.line < pMap.MAP_HEIGHT then
@@ -154,7 +160,7 @@ function hero.Update(pMap, dt)
 
 				local id = pMap.grid[hero.line][hero.column]
 
-				----On keyboard push hero collides with solid tiles : hero stays on his "previous" tile
+				----COLLISION WITH SOLID TILES (hero stays on his tile) + CLEARING FOG
 				if pMap.isSolid(id) == true then
 					hero.column = old_column
 					hero.line = old_line
@@ -163,7 +169,7 @@ function hero.Update(pMap, dt)
 				end
 				----
 
-				----On keyboard push if the hero collides with tiles that hurt him (cactus, lava)
+				----COLLISION WITH HURTING TILES (LAVA, CACTUS)
 				if pMap.isCactus(id) == true or pMap.isLava(id) == true then
 					if hero.energy > 0 then
 						hero.energy = hero.energy - 1
