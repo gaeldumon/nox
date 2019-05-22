@@ -141,7 +141,7 @@ function hero.Update(pMap, dt)
 				if love.keyboard.isDown('up') and hero.line > 1 then
 					hero.line = hero.line - 1
 				end
-
+				--@BUG SOURCE TO FIX : something about the controls after escaping 
 				if love.keyboard.isDown('right') and hero.column < pMap.MAP_WIDTH or hero.line > 12 then
 					hero.column = hero.column + 1
 					if hero.column > pMap.MAP_WIDTH then
