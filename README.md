@@ -1,8 +1,8 @@
 # Game Dev Journey
 
-### Part#1 - Lua and Love2D
+### NOX
 
-"Get the fuck out!" prototype
+Year 2569, now rain brings a substance that destroys everything it touches, you have to escape or you might die, but how ?!
 
 ![Screenshot](screenshot/nox-1.png)
 
