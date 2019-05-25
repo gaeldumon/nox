@@ -19,6 +19,7 @@ hero.die = false
 
 tree_cut = false
 craft_bucket = false
+door_line = 13
 
 hero.sound_cut = nil
 hero.sound_craftBucket = nil
@@ -142,8 +143,13 @@ function hero.Update(pMap, dt)
 					hero.line = hero.line - 1
 				end
 				
-				if love.keyboard.isDown('right') and hero.column < pMap.MAP_WIDTH then
-					hero.column = hero.column + 1
+				if love.keyboard.isDown('right') then
+					if hero.column < pMap.MAP_WIDTH then
+						hero.column = hero.column + 1
+					elseif hero.column == pMap.MAP_WIDTH and hero.line >= door_line then
+						hero.column = 2
+						hero.escape = true
+					end	
 				end
 
 				if love.keyboard.isDown('down') and hero.line < pMap.MAP_HEIGHT then
