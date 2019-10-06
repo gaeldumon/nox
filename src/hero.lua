@@ -28,7 +28,7 @@ hero.sound_waterOnLava = nil
 hero.sound_die = nil
 hero.sound_hurt = nil
 
-function hero.Load()
+function hero.load()
 	hero.Frames[1] = love.graphics.newImage('assets/images/player_1.png')
 	hero.Frames[2] = love.graphics.newImage('assets/images/player_2.png')
 	hero.Frames[3] = love.graphics.newImage('assets/images/player_3.png')
@@ -42,9 +42,10 @@ function hero.Load()
 	hero.sound_hurt = love.audio.newSource('assets/sounds/hurt.wav', 'static')
 	hero.sound_hurt:setVolume(0.2)
 	hero.sound_die = love.audio.newSource('assets/sounds/death.wav', 'static')
+	hero.sound_die:setVolume(0.2)
 end
 
-function hero.Update(pMap, dt)
+function hero.update(pMap, dt)
 
 	if hero.die == false then
 
@@ -195,7 +196,7 @@ function hero.Update(pMap, dt)
 
 end
 
-function hero.Draw(pMap)
+function hero.draw(pMap)
 	local x = (hero.column - 1) * pMap.TILE_WIDTH
 	local y = (hero.line - 1) * pMap.TILE_HEIGHT
 	local hero_h = hero.Frames[math.floor(hero.currentFrame)]:getHeight()
