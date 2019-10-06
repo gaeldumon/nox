@@ -10,14 +10,15 @@ function math.dist(x1,y1, x2,y2) return ((x2-x1)^2+(y2-y1)^2)^0.5 end
 function love.load()
 	def.current_screen = 'menu'
 	menu.load()
-  	game.Load()
+  	game.load()
+  	gameover.load()
 end
 
 function love.update(dt)
 	if def.current_screen == 'menu' then
 		menu.update(dt)
 	elseif def.current_screen == 'game' then
-		game.Update(dt)
+		game.update(dt)
 	end
 end
 
@@ -25,9 +26,9 @@ function love.draw()
 	if def.current_screen == 'menu' then
 		menu.draw()
 	elseif def.current_screen == 'game' then
-		game.Draw()
+		game.draw()
 	elseif def.current_screen == 'gameover' then
-		gameover.Draw()
+		gameover.draw()
 	end
 end
 
