@@ -31,8 +31,23 @@ end
 
 function this.load()
 	this.bg = love.graphics.newImage('assets/images/nox-menu.png')
+
 	this.rain = {}
 	this.timer = 0
+
+	this.text_1 = {}
+	this.text_1.x = def.SCREEN_WIDTH/3
+	this.text_1.y = def.SCREEN_HEIGHT/3
+	this.text_1.msg = "NOX"
+	this.text_1.font = love.graphics.newFont('assets/fonts/sixty.ttf', 200)
+	this.text_1.color = def.color.nox_green
+
+	this.text_2 = {}
+	this.text_2.x = this.text_1.x + def.SCREEN_WIDTH/50
+	this.text_2.y = this.text_1.y + def.SCREEN_HEIGHT/3
+	this.text_2.msg = "Press ENTER to start"
+	this.text_2.font = love.graphics.newFont('assets/fonts/sixty.ttf', 40)
+	this.text_2.color = def.color.grey
 end
 
 function this.update(dt)
@@ -50,10 +65,19 @@ end
 function this.draw()
 	love.graphics.draw(this.bg)
 	def.draw_sprites(this.rain)
+
+	love.graphics.setFont(this.text_1.font)
+	love.graphics.setColor(this.text_1.color)
+	love.graphics.print(this.text_1.msg, this.text_1.x, this.text_1.y)
+
+	love.graphics.setFont(this.text_2.font)
+	love.graphics.setColor(this.text_2.color)
+	love.graphics.print(this.text_2.msg, this.text_2.x, this.text_2.y)
+	love.graphics.setColor(1,1,1)
 end
 
 function this.keypressed(key)
-	if key == 'space' then
+	if key == 'return' then
 		def.current_screen = 'game'
 	end
 end
