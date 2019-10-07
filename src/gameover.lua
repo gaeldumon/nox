@@ -14,7 +14,7 @@ function this.load()
 	this.rand_x = love.math.random(10, def.SCREEN_WIDTH/1.5)
 	this.rand_y = love.math.random(10, def.SCREEN_HEIGHT/1.5)
 
-   	this.font = love.graphics.newFont('assets/fonts/sixty.ttf', 340)
+   	this.font = love.graphics.newFont('assets/fonts/sixty.ttf', 400)
 end
 
 function this.draw()
