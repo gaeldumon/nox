@@ -5,9 +5,10 @@ local this = {}
 function this.load()
 	this.text = {
 		{"You may avoid\nthis kind of ground."},
-		{"You were going to die\nanyway."},
+		{"You were going to die\n no matter what anyway."},
 		{"Maybe if you put\na little more effort..."},
-		{"We are all to blame."}
+		{"We are all to blame."},
+		{"It is too late,\nwe are doomed."}
 	}
 
 	this.rand_n = love.math.random(1, #this.text)
