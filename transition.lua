@@ -38,6 +38,7 @@ function tr.screenFadeIn(dt)
 		tr.fadeinAlpha = tr.fadeinAlpha + (60*dt) / 200
  	else
 		tr.fadeinAlpha = 1
+		return true
 	end
 end
 
