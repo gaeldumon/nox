@@ -12,7 +12,6 @@ hero.actionPressed = false
 hero.cut = 0
 hero.wood = 0
 hero.bucket = 0
-hero.energy = 1
 hero.escape = false
 
 hero.die = false
@@ -124,9 +123,8 @@ function hero.update(pMap, dt)
 		----HERO DIES - GAME OVER STATE - hero.die is used in Game to pause hero update, make text, stop game music.
 		do
 			local id = pMap.grid[hero.line][hero.column]
-			if pMap.isPlague(id) == true or pMap.isLava(id) == true or hero.energy == 0 then
+			if pMap.isPlague(id) == true or pMap.isLava(id) == true then
 				hero.die = true
-				hero.energy = 0
 				hero.sound_die:play()
 			end
 		end
