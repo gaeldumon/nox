@@ -37,32 +37,6 @@ this.map.grid = {
     { 21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,1,37,37,37 }
 }
 
---[[this.map.grid2 = {
-    { 15,15,14,15,14,10,10,10,10,61,10,13,10,10,10,10,10,10,13,14,15,15,15,15,15,15,15,15,15,15,15,15 },
-    { 15,15,14,14,14,11,11,11,10,10,10,13,10,10,10,10,10,10,10,14,15,15,129,15,15,15,15,15,15,68,15,15 },
-    { 15,15,68,14,68,19,19,19,11,10,10,13,10,10,169,10,10,10,10,13,14,15,15,15,15,15,15,15,15,15,15,15 },
-    { 15,15,15,15,14,19,19,19,19,11,10,13,10,10,10,10,10,10,10,10,13,14,15,15,15,68,15,15,15,15,15,15 },
-    { 15,68,15,15,14,19,19,19,19,11,10,13,10,10,10,10,10,10,61,10,10,14,15,15,15,15,15,15,15,15,15,15 },
-    { 15,15,15,15,14,19,19,19,11,10,10,13,10,10,10,10,10,10,10,10,10,14,15,15,129,15,15,15,68,15,129,15 },
-    { 15,15,15,68,14,11,11,11,10,10,61,13,10,10,10,10,10,10,10,10,10,14,15,15,15,15,15,15,15,15,15,15 },
-    { 14,14,14,14,14,13,13,13,13,13,13,13,10,10,10,10,10,169,10,10,10,13,14,15,15,15,15,15,15,15,15,15 },
-    { 14,14,14,14,14,10,10,10,13,10,10,10,10,10,10,10,10,10,10,10,61,10,13,14,14,14,14,14,14,14,15,129 },
-    { 14,14,14,14,14,10,10,10,13,55,10,58,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,13,14,14 },
-    { 14,14,15,15,15,10,10,10,13,10,10,10,55,10,58,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10 },
-    { 14,14,15,15,15,10,10,10,13,10,58,10,10,10,10,10,10,169,10,10,10,10,10,10,61,10,10,10,10,10,1,1 },
-    { 14,14,15,15,15,10,10,10,13,10,10,10,58,10,10,10,10,10,10,10,10,61,10,10,10,10,10,10,10,1,37,37 },
-    { 14,14,15,15,13,13,13,13,13,10,55,10,10,10,55,10,10,10,10,10,10,10,10,10,10,10,10,1,1,37,37,37 },
-    { 14,14,15,15,13,10,10,10,10,10,10,10,55,10,10,10,10,169,10,10,10,10,10,10,10,10,1,37,37,37,37,37 },
-    { 14,15,15,15,13,10,10,10,10,142,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,1,37,37,37,37,37,37 },
-    { 37,15,15,15,13,10,10,10,10,10,10,10,10,142,10,10,10,10,10,10,10,169,10,10,1,37,37,37,37,37,37,37 },
-    { 37,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,1,37,37,37,37,37,37,37 },
-    { 37,37,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,1,37,37,37,37,37,37,37 },
-    { 37,37,37,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,19,1,37,37,37,37,37,37,37 },
-    { 37,37,37,37,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,1,37,37,37,37,37,37 },
-    { 37,37,37,37,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,1,37,37,37,37 },
-    { 37,37,37,37,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,21,1,37,37,37 }
-}]]
-
 this.map.grid2 = {
     { 76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76 },
     { 76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76 },
@@ -88,7 +62,6 @@ this.map.grid2 = {
     { 37,37,37,37,21,21,21,21,21,21,21,21,21,21,21,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76 },
     { 37,37,37,37,21,21,21,21,21,21,21,21,21,21,21,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76,76 }
 }
-
 
 this.map.fogGrid = {}
 
@@ -190,7 +163,7 @@ function this.makePlague(pMap)
     end
 end
 
-function this.map.mouseover(pMap)
+--[[function this.map.mouseover(pMap)
 	local mouseX = love.mouse.getX()
     local mouseY = love.mouse.getY()
     --We add one because of 1-based tables in lua (instead of 0)
@@ -202,7 +175,7 @@ function this.map.mouseover(pMap)
     else
       	print("Hors du tableau")
     end
-end
+end]]
 
 function this.loadTextures(pTilesheet, pTableTextures, pMap)
     local nb_cols = pTilesheet:getWidth() / pMap.TILE_WIDTH
@@ -268,12 +241,13 @@ function this.load()
 
    	this.font = love.graphics.newFont('assets/fonts/sixty.ttf', 40)
 
+   	----PLAGUE STUFF
    	this.timer_plague = 0
 	this.freq_plague = 30
 	this.sound_plague = love.audio.newSource('assets/sounds/plague.mp3', 'static')
+	----
 
    	this.music = love.audio.newSource('assets/sounds/cool.mp3', 'stream')
-   	--Volume is set to zero cause musicFadeout in transition.lua will take care of putting the sound up
    	this.music:setVolume(0)
    
    	this.tilesheet = love.graphics.newImage('assets/images/tilesheet.png')
@@ -315,30 +289,39 @@ function this.update(dt)
 
     hero.update(this.map, dt)
 
-   	this.timer_plague = this.timer_plague + (60*dt)
-   	if this.timer_plague >= this.freq_plague then
-   		this.makePlague(this.map)
-   		this.timer_plague = 0
-   	end
-
-   	if hero.escape == true then
-   		this.map.grid = this.map.grid2
+   	if hero.escape == true then 
+   		this.map.grid = this.map.grid2 
    	end
 
     if hero.die == true then
 		this.music:stop()
-		def.current_screen = 'gameover'
+		transition.screenFadeIn(dt)
+		if transition.screenFadeIn(dt) == true then
+			def.current_screen = 'gameover'
+		end
 	end
 
+    ----PLAGUE UPDATE
+    if hero.escape == false then
+	   	this.timer_plague = this.timer_plague + (60*dt)
+
+	   	if this.timer_plague >= this.freq_plague then
+	   		this.makePlague(this.map)
+	   		this.timer_plague = 0
+	   	end
+	end
+   	----
 end
 
 function this.draw()
 
     this.drawTextures(this.map, this.tileTextures, this.tilesheet)
+
+	hero.draw(this.map)
+
     if hero.escape == false then
     	this.drawFog(this.map, this.tileTextures, this.tilesheet)
     end
-	hero.draw(this.map)
 
     do
     	local padding_bottom = 40
@@ -347,20 +330,18 @@ function this.draw()
     	love.graphics.setFont(this.font)
 
     	love.graphics.setColor(def.color.grey)
-	    ----Printing hero stats and inventory
-	    local str_wood = "Life : " .. tostring(hero.energy)
-	    love.graphics.print(str_wood, padding_left, def.SCREEN_HEIGHT - padding_bottom)
-
+	    ----Printing hero inventory
 	    local str_stats = "Wood : " .. tostring(hero.wood)
-	    love.graphics.print(str_stats, padding_left*10, def.SCREEN_HEIGHT - padding_bottom)
+	    love.graphics.print(str_stats, padding_left, def.SCREEN_HEIGHT - padding_bottom)
 
 	    local str_bucket = "Water Bucket : " .. tostring(hero.bucket)
-	    love.graphics.print(str_bucket, padding_left*20, def.SCREEN_HEIGHT - padding_bottom)
+	    love.graphics.print(str_bucket, padding_left*10, def.SCREEN_HEIGHT - padding_bottom)
 	    ----
 	    love.graphics.setColor(1,1,1)
 	end
 
 	transition.drawFadeout()
+	transition.drawFadein()
 end
 
 return this
